@@ -1,7 +1,7 @@
 package com.phoenixnap.oss.ramlapisync.generation.rules.basic;
 
 import com.phoenixnap.oss.ramlapisync.generation.RamlParser;
-import com.phoenixnap.oss.ramlapisync.generation.rules.AbstractRuleTestBase;
+import com.phoenixnap.oss.ramlapisync.generation.rules.AbstractSingleControllerRuleTestBase;
 import com.sun.codemodel.JPackage;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
  * @author armin.weisser
  * @since 0.4.1
  */
-public class PackageRuleTest extends AbstractRuleTestBase {
+public class PackageRuleTest extends AbstractSingleControllerRuleTestBase {
 
     private final PackageRule rule = new PackageRule();
 

@@ -1,18 +1,17 @@
 package com.phoenixnap.oss.ramlapisync.generation.rules.basic;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-
-import java.io.Serializable;
-
-import org.junit.Test;
-
-import com.phoenixnap.oss.ramlapisync.generation.rules.AbstractRuleTestBase;
+import com.phoenixnap.oss.ramlapisync.generation.rules.AbstractSingleControllerRuleTestBase;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
+import org.junit.Test;
+
+import java.io.Serializable;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 
 /**
  * 
@@ -21,7 +20,7 @@ import com.sun.codemodel.JPackage;
  * @since   0.5.0
  *
  */
-public class ClassFieldDeclarationRuleTest extends AbstractRuleTestBase{
+public class ClassFieldDeclarationRuleTest extends AbstractSingleControllerRuleTestBase {
 
     @Test
     public void applyClassFieldDeclarationRule_shouldCreate_validAutowiredField() throws JClassAlreadyExistsException {

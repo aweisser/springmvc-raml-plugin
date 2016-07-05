@@ -1,16 +1,15 @@
 package com.phoenixnap.oss.ramlapisync.generation.rules;
 
-import org.junit.Test;
-
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import org.junit.Test;
 
 /**
  * @author armin.weisser
  * @since 0.4.1
  */
-public class Spring3ControllerRulesTest extends AbstractRuleTestBase {
+public class Spring3ControllerRulesTest extends AbstractSingleControllerRuleTestBase {
 
     private Rule<JCodeModel, JDefinedClass, ApiResourceMetadata> rule;
     

@@ -1,24 +1,23 @@
 package com.phoenixnap.oss.ramlapisync.generation.rules;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.RamlVerifier;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author kurtpa
  * @since 0.4.2
  */
-public class Issue32RulesTest extends AbstractRuleTestBase {
+public class Issue32RulesTest extends AbstractSingleControllerRuleTestBase {
 
 	private Rule<JCodeModel, JDefinedClass, ApiResourceMetadata> rule;
 
 	@BeforeClass
 	public static void initRaml() {
-		AbstractRuleTestBase.RAML = RamlVerifier.loadRamlFromFile(AbstractRuleTestBase.RESOURCE_BASE + "issue-32.raml");
+		AbstractSingleControllerRuleTestBase.RAML = RamlVerifier.loadRamlFromFile(AbstractSingleControllerRuleTestBase.RESOURCE_BASE + "issue-32.raml");
 	}
 	
 	@Test

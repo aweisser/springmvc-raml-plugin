@@ -1,6 +1,6 @@
 package com.phoenixnap.oss.ramlapisync.generation.rules.basic;
 
-import com.phoenixnap.oss.ramlapisync.generation.rules.AbstractRuleTestBase;
+import com.phoenixnap.oss.ramlapisync.generation.rules.AbstractSingleControllerRuleTestBase;
 import com.sun.codemodel.JClassAlreadyExistsException;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
  * @author armin.weisser
  * @since 0.4.1
  */
-public class MethodParamsRuleTest extends AbstractRuleTestBase {
+public class MethodParamsRuleTest extends AbstractSingleControllerRuleTestBase {
 
     private MethodParamsRule rule = new MethodParamsRule();
 

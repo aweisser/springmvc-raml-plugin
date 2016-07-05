@@ -9,7 +9,7 @@ import org.junit.Test;
  * @author armin.weisser
  * @since 0.4.1
  */
-public class Spring4ControllerRulesTest extends AbstractRuleTestBase {
+public class Spring4ControllerRulesTest extends AbstractSingleControllerRuleTestBase {
 
     private Rule<JCodeModel, JDefinedClass, ApiResourceMetadata> rule;
 
