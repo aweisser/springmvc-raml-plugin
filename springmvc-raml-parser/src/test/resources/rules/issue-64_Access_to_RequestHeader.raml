@@ -1,0 +1,13 @@
+#%RAML 0.8
+title: myapi
+mediaType: application/json
+baseUri: /
+
+/issue64:
+  description: The Issue64Controller class
+  get:
+    headers:
+      Accept-Language:
+        type: string
+        required: false
+        example: en-US
