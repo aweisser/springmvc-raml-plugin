@@ -52,13 +52,16 @@ public class ControllerMethodSignatureRule implements Rule<JDefinedClass, JMetho
 
     private Rule<JDefinedClass, JType, ApiActionMetadata> responseTypeRule;
     private Rule<CodeModelHelper.JExtMethod, JMethod, ApiActionMetadata> paramsRule;
+    private Rule<CodeModelHelper.JExtMethod, JMethod, ApiActionMetadata> headerParamsRule;
 
     public ControllerMethodSignatureRule(
             Rule<JDefinedClass, JType, ApiActionMetadata> responseTypeRule,
-            Rule<CodeModelHelper.JExtMethod, JMethod, ApiActionMetadata> paramsRule)
+            Rule<CodeModelHelper.JExtMethod, JMethod, ApiActionMetadata> paramsRule,
+            Rule<CodeModelHelper.JExtMethod, JMethod, ApiActionMetadata> headerParamsRule)
     {
         this.responseTypeRule = responseTypeRule;
         this.paramsRule = paramsRule;
+        this.headerParamsRule = headerParamsRule;
     }
 
     @Override
@@ -66,6 +69,7 @@ public class ControllerMethodSignatureRule implements Rule<JDefinedClass, JMetho
         JType responseType = responseTypeRule.apply(endpointMetadata, generatableType);
         JMethod jMethod = generatableType.method(JMod.PUBLIC, responseType, endpointMetadata.getName());
         jMethod = paramsRule.apply(endpointMetadata, ext(jMethod, generatableType.owner()));
+        jMethod = headerParamsRule.apply(endpointMetadata, ext(jMethod, generatableType.owner()));
         return jMethod;
     }
 

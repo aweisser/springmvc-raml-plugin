@@ -12,21 +12,13 @@
  */
 package com.phoenixnap.oss.ramlapisync.generation.rules.spring;
 
+import com.phoenixnap.oss.ramlapisync.generation.rules.basic.*;
 import org.apache.commons.lang.StringUtils;
 
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.rules.GenericJavaClassRule;
 import com.phoenixnap.oss.ramlapisync.generation.rules.Rule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ClassCommentRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ControllerClassDeclarationRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ControllerInterfaceDeclarationRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ControllerMethodSignatureRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.DelegatingMethodBodyRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ImplementsControllerInterfaceRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodCommentRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodParamsRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.PackageRule;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -75,7 +67,8 @@ public abstract class SpringControllerDecoratorRule implements Rule<JCodeModel, 
                 .setMethodCommentRule(new MethodCommentRule())
                 .setMethodSignatureRule(new ControllerMethodSignatureRule(
                         new SpringResponseEntityRule(),
-                        new MethodParamsRule()))
+                        new MethodParamsRule(),
+                        new HeaderMethodParamsRule()))
                 .apply(metadata, generatableType);
 
         String delegateFieldName = StringUtils.uncapitalize(generatedInterface.name()+"Delegate");
@@ -93,7 +86,8 @@ public abstract class SpringControllerDecoratorRule implements Rule<JCodeModel, 
                 .addMethodAnnotationRule(getResponseBodyAnnotationRule())
                 .setMethodSignatureRule(new ControllerMethodSignatureRule(
                         new SpringResponseEntityRule(),
-                        new SpringMethodParamsRule()))
+                        new SpringMethodParamsRule(),
+                        new SpringHeaderMethodParamsRule()))
                 .setMethodBodyRule(new DelegatingMethodBodyRule(delegateFieldName));
 
         return delegateGenerator.apply(metadata, generatableType);

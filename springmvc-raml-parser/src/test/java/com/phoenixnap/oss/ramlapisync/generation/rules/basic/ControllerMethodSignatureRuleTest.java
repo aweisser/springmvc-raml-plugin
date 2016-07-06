@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
  */
 public class ControllerMethodSignatureRuleTest extends AbstractSingleControllerRuleTestBase {
 
-    private ControllerMethodSignatureRule rule = new ControllerMethodSignatureRule(new SpringResponseEntityRule(), new MethodParamsRule());
+    private ControllerMethodSignatureRule rule = new ControllerMethodSignatureRule(new SpringResponseEntityRule(), new MethodParamsRule(), new HeaderMethodParamsRule());
 
     @Test
     public void applyMethodRule_shouldCreate_validMethodSignatureWithEmptyBody() throws JClassAlreadyExistsException {

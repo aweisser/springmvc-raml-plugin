@@ -16,11 +16,7 @@ import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.rules.GenericJavaClassRule;
 import com.phoenixnap.oss.ramlapisync.generation.rules.Rule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ClassCommentRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ControllerInterfaceDeclarationRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ControllerMethodSignatureRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodCommentRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.PackageRule;
+import com.phoenixnap.oss.ramlapisync.generation.rules.basic.*;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
@@ -62,7 +58,8 @@ public abstract class SpringControllerInterfaceRule implements Rule<JCodeModel, 
                 .addMethodAnnotationRule(getResponseBodyAnnotationRule())
                 .setMethodSignatureRule(new ControllerMethodSignatureRule(
                         new SpringResponseEntityRule(),
-                        new SpringMethodParamsRule())
+                        new SpringMethodParamsRule(),
+		                new SpringHeaderMethodParamsRule())
                 );
         return generator.apply(metadata, generatableType);
     }

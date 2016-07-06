@@ -14,21 +14,12 @@ package com.phoenixnap.oss.ramlapisync.generation.rules;
 
 import java.util.Map;
 
+import com.phoenixnap.oss.ramlapisync.generation.rules.basic.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ClassAnnotationRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ClassCommentRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ClassFieldDeclarationRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ClientInterfaceDeclarationRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ControllerMethodSignatureRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ImplementsControllerInterfaceRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodCommentRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodParamsRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.PackageRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.ResourceClassDeclarationRule;
 import com.phoenixnap.oss.ramlapisync.generation.rules.spring.SpringResponseEntityRule;
 import com.phoenixnap.oss.ramlapisync.generation.rules.spring.SpringRestClientMethodBodyRule;
 import com.sun.codemodel.JCodeModel;
@@ -77,7 +68,8 @@ public class Spring4RestTemplateClientRule implements ConfigurableRule<JCodeMode
                 .setMethodCommentRule(new MethodCommentRule())
                 .setMethodSignatureRule(new ControllerMethodSignatureRule(
                         new SpringResponseEntityRule(),
-                        new MethodParamsRule(true)))
+                        new MethodParamsRule(true),
+		                new HeaderMethodParamsRule(true)))
                 .apply(metadata, generatableType);
 
         
@@ -95,7 +87,8 @@ public class Spring4RestTemplateClientRule implements ConfigurableRule<JCodeMode
                 .setMethodCommentRule(new MethodCommentRule())                
                 .setMethodSignatureRule(new ControllerMethodSignatureRule(
                         new SpringResponseEntityRule(),
-                        new MethodParamsRule()))
+                        new MethodParamsRule(),
+		                new HeaderMethodParamsRule()))
                 .setMethodBodyRule(new SpringRestClientMethodBodyRule(restTemplateFieldName, baseUrlFieldName));
 
         return clientGenerator.apply(metadata, generatableType);
