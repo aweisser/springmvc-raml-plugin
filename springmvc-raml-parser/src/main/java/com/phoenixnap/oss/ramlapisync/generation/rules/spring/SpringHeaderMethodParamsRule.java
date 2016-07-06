@@ -12,19 +12,13 @@
  */
 package com.phoenixnap.oss.ramlapisync.generation.rules.spring;
 
-import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
-import com.phoenixnap.oss.ramlapisync.data.ApiParameterMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.CodeModelHelper;
 import com.phoenixnap.oss.ramlapisync.generation.rules.basic.HeaderMethodParamsRule;
-import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodParamsRule;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JVar;
 import org.raml.model.parameter.Header;
-import org.raml.model.parameter.UriParameter;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Generates method parameters with Spring annotations for an endpoint defined by headers in ApiMappingMetadata.
@@ -69,6 +63,11 @@ public class SpringHeaderMethodParamsRule extends HeaderMethodParamsRule {
         if(!header.isRequired()) {
             jAnnotationUse.param("required", false);
         }
+
+        if(StringUtils.hasText(header.getDefaultValue())) {
+            jAnnotationUse.param("defaultValue", header.getDefaultValue());
+        }
+
         return jVar;
     }
 
