@@ -1,0 +1,20 @@
+Analysis:
+
+Dependencies to org.raml (java-raml-parser)
+
+- Module springmvc-raml-plugin only has two dependencies
+    - Only the top level object of a raml file (type org.raml.model.Raml) is used here.
+
+- Module springmvc-raml-parser is highly coupled to
+    - org.raml.model (nearly all dependencies to this package)
+    - org.raml.emmitter (very few)
+    - org.raml.parser (very few)
+
+
+Approach:
+
+I'd suggest to decouple the springmvc-raml-parser from the third party java-raml-parser
+by introducing an abstraction layer (interfaces) and adapters to java-raml-parser v1 and v2 (raml0.8) and later v2 (raml1.0).
+
+For additional raml 1.0 features we can use extensions to the generic interfaces.
+This way we can leave the existing code as is with a high refactoring safety and robustness.
