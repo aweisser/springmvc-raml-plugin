@@ -9,16 +9,16 @@
  */
 package com.phoenixnap.oss.ramlapisync.naming;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.raml.model.Action;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import org.raml.model.MimeType;
 import org.raml.model.Raml;
 import org.raml.model.Resource;
 import org.raml.model.Response;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Class containing utility methods for modifying Raml models
@@ -80,7 +80,7 @@ public class RamlHelper {
 	 * @param existingAction The action we already have in our model
 	 * @param newAction The action we we want to include in the model
 	 */
-	public static void mergeActions (Action existingAction, Action newAction) {
+	public static void mergeActions (RamlAction existingAction, RamlAction newAction) {
 		Response existingSuccessfulResponse = getSuccessfulResponse(existingAction);
 		Response successfulResponse = getSuccessfulResponse(newAction);
 
@@ -97,7 +97,7 @@ public class RamlHelper {
 	 * @param action The action to parse
 	 * @return The Successful response or null if not found
 	 */
-	public static Response getSuccessfulResponse(Action action) {
+	public static Response getSuccessfulResponse(RamlAction action) {
 		String[] successfulResponses = new String[] {"200", "201"};
 		for (String code : successfulResponses) {
 			if (action != null && !CollectionUtils.isEmpty(action.getResponses()) && action.getResponses().containsKey(code)) {

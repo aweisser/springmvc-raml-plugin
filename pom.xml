@@ -11,6 +11,23 @@
 	<url>https://github.com/phoenixnap/springmvc-raml-plugin/</url>
 	<packaging>pom</packaging>
 
+	<repositories>
+		<repository>
+			<id>jcenter-snapshots</id>
+			<name>jcenter</name>
+			<url>https://jcenter.bintray.com/</url>
+		</repository>
+		<repository>
+			<id>vi.thirdparty</id>
+			<url>http://maven.virtual-identity.net/content/repositories/thirdparty/</url>
+		</repository>
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<url>https://repository-master.mulesoft.org/releases/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

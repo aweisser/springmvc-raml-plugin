@@ -12,11 +12,10 @@
  */
 package com.phoenixnap.oss.ramlapisync.style.checkers;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.raml.model.Action;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.style.RamlStyleCheckerAdapter;
+import com.phoenixnap.oss.ramlapisync.style.StyleIssue;
+import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
 import org.raml.model.ActionType;
 import org.raml.model.Raml;
 import org.slf4j.Logger;
@@ -25,9 +24,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
-import com.phoenixnap.oss.ramlapisync.style.RamlStyleCheckerAdapter;
-import com.phoenixnap.oss.ramlapisync.style.StyleIssue;
-import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -54,7 +53,7 @@ public class ResponseCodeDefinitionStyleChecker extends RamlStyleCheckerAdapter 
 
 	
 	@Override
-	public Set<StyleIssue> checkActionStyle(ActionType key, Action value,
+	public Set<StyleIssue> checkActionStyle(ActionType key, RamlAction value,
 			IssueLocation location, Raml raml) {
 		logger.debug("Checking Action: " + key);
 		Set<StyleIssue> issues = new LinkedHashSet<>();

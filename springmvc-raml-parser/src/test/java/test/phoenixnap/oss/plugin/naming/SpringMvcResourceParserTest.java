@@ -12,45 +12,8 @@
  */
 package test.phoenixnap.oss.plugin.naming;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.raml.model.Action;
-import org.raml.model.ActionType;
-import org.raml.model.MimeType;
-import org.raml.model.ParamType;
-import org.raml.model.Raml;
-import org.raml.model.Resource;
-import org.raml.model.Response;
-import org.raml.model.parameter.FormParameter;
-import org.raml.model.parameter.QueryParameter;
-import org.raml.model.parameter.UriParameter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-
-import test.phoenixnap.oss.plugin.naming.testclasses.BugController;
-import test.phoenixnap.oss.plugin.naming.testclasses.MultipleContentTypeTestController;
-import test.phoenixnap.oss.plugin.naming.testclasses.NoValueController;
-import test.phoenixnap.oss.plugin.naming.testclasses.TestController;
-import test.phoenixnap.oss.plugin.naming.testclasses.UriPrefixIgnoredController;
-
-import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
+import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.RamlParser;
 import com.phoenixnap.oss.ramlapisync.generation.RamlVerifier;
 import com.phoenixnap.oss.ramlapisync.javadoc.JavaDocEntry;
@@ -59,6 +22,28 @@ import com.phoenixnap.oss.ramlapisync.javadoc.JavaDocStore;
 import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.parser.FileSearcher;
 import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.raml.model.*;
+import org.raml.model.parameter.FormParameter;
+import org.raml.model.parameter.QueryParameter;
+import org.raml.model.parameter.UriParameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import test.phoenixnap.oss.plugin.naming.testclasses.*;
+
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for the Spring MVC Parser
@@ -85,7 +70,7 @@ public class SpringMvcResourceParserTest {
 
 	private void validateSimpleAjaxResponse(Action action) {
 		assertEquals(1, action.getResponses().size());
-		Response response = RamlHelper.getSuccessfulResponse(action);
+		Response response = RamlHelper.getSuccessfulResponse(RamlAction.asRamlAction(action));
 		assertEquals("Checking return javadoc", RETURN_JAVADOC, response.getDescription());
 		assertEquals(1, response.getBody().size());
 		assertNotNull("Check Response is there", response.getBody().get(DEFAULT_MEDIA_TYPE));
@@ -94,7 +79,7 @@ public class SpringMvcResourceParserTest {
 	
 	private void validateMultipleResponse(Action action) {
 		assertEquals(1, action.getResponses().size());
-		Response response = RamlHelper.getSuccessfulResponse(action);
+		Response response = RamlHelper.getSuccessfulResponse(RamlAction.asRamlAction(action));
 		assertEquals("Checking return javadoc", RETURN_JAVADOC, response.getDescription());
 		assertEquals(2, response.getBody().size());
 		assertNotNull("Check Response is there", response.getBody().get(MediaType.APPLICATION_JSON_VALUE));		

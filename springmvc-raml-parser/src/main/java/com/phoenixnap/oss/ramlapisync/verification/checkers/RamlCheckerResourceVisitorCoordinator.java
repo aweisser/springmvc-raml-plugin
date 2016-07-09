@@ -12,14 +12,9 @@
  */
 package com.phoenixnap.oss.ramlapisync.verification.checkers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.phoenixnap.oss.ramlapisync.naming.Pair;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.verification.*;
 import org.raml.model.Action;
 import org.raml.model.ActionType;
 import org.raml.model.Raml;
@@ -27,14 +22,8 @@ import org.raml.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.phoenixnap.oss.ramlapisync.naming.Pair;
-import com.phoenixnap.oss.ramlapisync.verification.Issue;
-import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
-import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
-import com.phoenixnap.oss.ramlapisync.verification.IssueType;
-import com.phoenixnap.oss.ramlapisync.verification.RamlActionVisitorCheck;
-import com.phoenixnap.oss.ramlapisync.verification.RamlChecker;
-import com.phoenixnap.oss.ramlapisync.verification.RamlResourceVisitorCheck;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Raml checker that cross checks Resources between 2 RAML models. Only directly corresponding resources will be parsed 
@@ -151,11 +140,11 @@ public class RamlCheckerResourceVisitorCoordinator implements RamlChecker {
 				if (referenceActions != null && referenceActions.size() > 0 && targetActions != null && targetActions.size() > 0) {
 					for (Entry<ActionType, Action> action : referenceActions.entrySet()) {
 						Action targetAction = targetActions.get(action.getKey());
-						String actionLocation = Issue.buildRamlLocation(reference, referenceActions.get(action.getKey()), null);
+						String actionLocation = Issue.buildRamlLocation(reference, RamlAction.asRamlAction(referenceActions.get(action.getKey())), null);
 						if (targetAction != null) {
 							logger.debug("Visiting action: "+ actionLocation);
 							for (RamlActionVisitorCheck actionCheck : actionCheckers) {
-								Pair<Set<Issue>, Set<Issue>> check = actionCheck.check(action.getKey(), action.getValue(), targetAction, location, severity);
+								Pair<Set<Issue>, Set<Issue>> check = actionCheck.check(action.getKey(), RamlAction.asRamlAction(action.getValue()), RamlAction.asRamlAction(targetAction), location, severity);
 								if (check != null && check.getFirst() != null) {
 									warnings.addAll(check.getFirst());
 								}

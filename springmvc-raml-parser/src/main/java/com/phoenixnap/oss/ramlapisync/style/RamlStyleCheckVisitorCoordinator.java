@@ -12,14 +12,9 @@
  */
 package com.phoenixnap.oss.ramlapisync.style;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.phoenixnap.oss.ramlapisync.naming.Pair;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.verification.*;
 import org.raml.model.Action;
 import org.raml.model.ActionType;
 import org.raml.model.Raml;
@@ -27,12 +22,8 @@ import org.raml.model.Resource;
 import org.raml.model.parameter.QueryParameter;
 import org.raml.model.parameter.UriParameter;
 
-import com.phoenixnap.oss.ramlapisync.naming.Pair;
-import com.phoenixnap.oss.ramlapisync.verification.Issue;
-import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
-import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
-import com.phoenixnap.oss.ramlapisync.verification.IssueType;
-import com.phoenixnap.oss.ramlapisync.verification.RamlChecker;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Provides a Vistor pattern approach to Style Checks. Iterates through the model and invokes callbacks on specific checkers.
@@ -97,7 +88,7 @@ public class RamlStyleCheckVisitorCoordinator implements RamlChecker {
 				if (actions != null) {
 					for (Entry<ActionType, Action> actionEntry : actions.entrySet()) {
 						for (RamlStyleChecker checker : checkers) {
-							warnings.addAll(checker.checkActionStyle(actionEntry.getKey(), actionEntry.getValue(), location, raml));
+							warnings.addAll(checker.checkActionStyle(actionEntry.getKey(), RamlAction.asRamlAction(actionEntry.getValue()), location, raml));
 						}
 						
 						/*

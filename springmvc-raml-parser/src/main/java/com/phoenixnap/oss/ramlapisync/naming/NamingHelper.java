@@ -12,16 +12,16 @@
  */
 package com.phoenixnap.oss.ramlapisync.naming;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import org.jsonschema2pojo.util.NameHelper;
-import org.raml.model.Action;
 import org.raml.model.ActionType;
 import org.raml.model.Resource;
 import org.raml.parser.utils.Inflector;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class containing methods relating to naming converntions and string cleanup for naming
@@ -304,7 +304,7 @@ public class NamingHelper {
 	 * @param actionType The ActionType/HTTP Verb for this Action
 	 * @return The java name of the method that will represent this Action
 	 */
-	public static String getActionName(Resource controllerizedResource, Resource resource, Action action,
+	public static String getActionName(Resource controllerizedResource, Resource resource, RamlAction action,
 			ActionType actionType) {
 		
 		String url = resource.getUri();

@@ -12,16 +12,11 @@
  */
 package com.phoenixnap.oss.ramlapisync.data;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.raml.model.Action;
+import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
+import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
+import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
+import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import org.raml.model.ActionType;
 import org.raml.model.MimeType;
 import org.raml.model.Resource;
@@ -31,10 +26,9 @@ import org.raml.model.parameter.UriParameter;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
-import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
-import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
-import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
-import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 
 /**
@@ -49,7 +43,7 @@ public class ApiActionMetadata {
 	ApiResourceMetadata parent;
 	Resource resource;
 	ActionType actionType;
-	Action action;
+	RamlAction action;
 
 	String requestBodyMime = null;
 	ApiBodyMetadata requestBody = null;
@@ -59,7 +53,7 @@ public class ApiActionMetadata {
 
 	private String responseContentTypeFilter;
 
-	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, ActionType actionType, Action action, String responseContentTypeFilter) {
+	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, ActionType actionType, RamlAction action, String responseContentTypeFilter) {
 		super();
 		this.parent = parent;
 		this.resource = resource;
@@ -71,7 +65,7 @@ public class ApiActionMetadata {
 
 	}
 
-	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, ActionType actionType, Action action) {
+	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, ActionType actionType, RamlAction action) {
 		this(parent, resource, actionType, action, null);
 	}
 
@@ -251,11 +245,11 @@ public class ApiActionMetadata {
 		this.actionType = actionType;
 	}
 
-	public Action getAction() {
+	public RamlAction getAction() {
 		return action;
 	}
 
-	public void setAction(Action action) {
+	public void setAction(RamlAction action) {
 		this.action = action;
 	}
 
