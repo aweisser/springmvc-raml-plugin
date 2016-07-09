@@ -14,6 +14,7 @@ package com.phoenixnap.oss.ramlapisync.verification.checkers;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import com.phoenixnap.oss.ramlapisync.verification.*;
 import org.raml.model.Action;
 import org.raml.model.ActionType;
@@ -54,10 +55,10 @@ public class ActionExistenceChecker implements RamlResourceVisitorCheck {
 		
 		if (referenceActions != null && referenceActions.size() > 0) {
 			for (Entry<ActionType, Action> action : referenceActions.entrySet()) {
-				RamlAction targetAction = RamlAction.asRamlAction(targetActions.get(action.getKey()));
+				RamlAction targetAction = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(targetActions.get(action.getKey()));
 				if (targetAction == null) {
 					//Resource (and all children) missing - Log it
-					Issue issue = new Issue(maxSeverity, location, IssueType.MISSING, ACTION_MISSING , reference, RamlAction.asRamlAction(action.getValue()));
+					Issue issue = new Issue(maxSeverity, location, IssueType.MISSING, ACTION_MISSING , reference, RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(action.getValue()));
 					RamlCheckerResourceVisitorCoordinator.addIssue(errors, warnings, issue, "Expected action missing: "+ action.getKey() + " in " + location.name());
 				}
 			}

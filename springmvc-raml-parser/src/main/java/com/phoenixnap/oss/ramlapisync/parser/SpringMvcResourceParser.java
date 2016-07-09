@@ -25,6 +25,9 @@ import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import org.raml.model.*;
 import org.raml.model.parameter.FormParameter;
 import org.raml.model.parameter.UriParameter;
@@ -57,14 +60,14 @@ public class SpringMvcResourceParser extends ResourceParser {
 	 */
 	protected boolean restrictOnMediaType;
 
-	public SpringMvcResourceParser(File path, String version, String defaultMediaType, boolean restrictOnMediaType) {
-		super(path, version, defaultMediaType);
+	public SpringMvcResourceParser(File path, String version, String defaultMediaType, boolean restrictOnMediaType, RamlModelFactory ramlModelFactory) {
+		super(path, version, defaultMediaType, ramlModelFactory);
 		this.restrictOnMediaType = restrictOnMediaType;
 	}
 
 	@Override
 	protected Pair<String, MimeType> extractRequestBody(Method method, Map<String, String> parameterComments,
-			String comment, List<ApiParameterMetadata> apiParameters) {
+														String comment, List<ApiParameterMetadata> apiParameters) {
 		MimeType mimeType = new MimeType();
 		String type;
 		//Handle empty body
@@ -328,7 +331,7 @@ public class SpringMvcResourceParser extends ResourceParser {
 	}
 
 	@Override
-	protected Map<ActionType, String> getHttpMethodAndName(Method method) {
+	protected Map<RamlActionType, String> getHttpMethodAndName(Method method) {
 		RequestMapping methodMapping = getRequestMapping(method);
 		RequestMapping classMapping = getAnnotation(method.getDeclaringClass(), RequestMapping.class, false);
 		RestController classRestController = getAnnotation(method.getDeclaringClass(), RestController.class,
@@ -360,10 +363,10 @@ public class SpringMvcResourceParser extends ResourceParser {
 			name += NamingHelper.resolveProperties(methodMapping.value()[0]);
 		}
 
-		Map<ActionType, String> outMap = new HashMap<>();
+		Map<RamlActionType, String> outMap = new HashMap<>();
 		for (RequestMethod rm : verbs) {
 			try {
-				ActionType apiAction = ActionType.valueOf(rm.name());
+				RamlActionType apiAction = RamlActionType.valueOf(rm.name());
 				outMap.put(apiAction, name);
 			} catch (Exception ex) {
 				// skip verb not supported by RAML
@@ -413,17 +416,17 @@ public class SpringMvcResourceParser extends ResourceParser {
 	@Override
 	protected void extractAndAppendResourceInfo(Method method, JavaDocEntry docEntry, Resource parentResource) {
 
-		Map<ActionType, String> methodActions = getHttpMethodAndName(method);
-		for (Entry<ActionType, String> methodAction : methodActions.entrySet()) {
-			Action action = new Action();
-			ActionType apiAction = methodAction.getKey();
+		Map<RamlActionType, String> methodActions = getHttpMethodAndName(method);
+		for (Entry<RamlActionType, String> methodAction : methodActions.entrySet()) {
+			RamlAction action = ramlModelFactory.createRamlAction();
+			RamlActionType apiActionType = methodAction.getKey();
 			String apiName = methodAction.getValue();
 			//Method assumes that the name starts with /
 			if (apiName != null && !apiName.startsWith("/")) {
 				apiName = "/" + apiName;
 			}
 			Map<String, String> pathDescriptions = getPathDescriptionsForMethod(method);
-			logger.info("Added call: " + apiName + " " +apiAction  + " from method: " + method.getName()  );
+			logger.info("Added call: " + apiName + " " +apiActionType  + " from method: " + method.getName()  );
 
 			String responseComment = docEntry == null ? null : docEntry.getReturnTypeComment();
 			Response response = extractResponseFromMethod(method, responseComment);
@@ -431,13 +434,13 @@ public class SpringMvcResourceParser extends ResourceParser {
 					.getParameterComments());
 			// Lets extract any query parameters (for Verbs that don't support bodies) and insert them in the Action
 			// model
-			action.getQueryParameters().putAll(extractQueryParameters(apiAction, method, parameterComments));
+			action.getQueryParameters().putAll(extractQueryParameters(apiActionType, method, parameterComments));
 
 			// Lets extract any request data that should go in the request body as json and insert it in the action
 			// model
-			action.setBody(extractRequestBodyFromMethod(apiAction, method, parameterComments));
+			action.setBody(extractRequestBodyFromMethod(apiActionType, method, parameterComments));
 			// Add any headers we need for the method
-			addHeadersForMethod(action, apiAction, method);
+			addHeadersForMethod(action, apiActionType, method);
 
 			String description = docEntry == null ? null : docEntry.getComment();
 			if (StringUtils.hasText(description)) {
@@ -526,14 +529,15 @@ public class SpringMvcResourceParser extends ResourceParser {
 				actionTargetResource = parentResource;
 			}
 			action.setResource(actionTargetResource);
-			action.setType(apiAction);
-			if (actionTargetResource.getActions().containsKey(apiAction)) {
+			action.setType(apiActionType);
+			if (actionTargetResource.getActions().containsKey(apiActionType)) {
 				//merge action
-				Action existingAction = actionTargetResource.getActions().get(apiAction);
-				RamlHelper.mergeActions(RamlAction.asRamlAction(existingAction), RamlAction.asRamlAction(action));
+				ActionType actionType = RamlActionType.asActionType(apiActionType); // TODO remove this when Resource becomes RamlResource
+				RamlAction existingAction = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(actionTargetResource.getActions().get(actionType));
+				RamlHelper.mergeActions(existingAction, action);
 				
 			} else {
-				actionTargetResource.getActions().put(apiAction, action);
+				actionTargetResource.getActions().put(RamlActionType.asActionType(apiActionType), ramlModelFactory.createAction(action));
 			}
 		}
 
@@ -551,7 +555,7 @@ public class SpringMvcResourceParser extends ResourceParser {
 	}
 
 	@Override
-	protected void addHeadersForMethod(Action action, ActionType actionType, Method method) {
+	protected void addHeadersForMethod(RamlAction action, RamlActionType actionType, Method method) {
 
 	}
 

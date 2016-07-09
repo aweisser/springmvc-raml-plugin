@@ -12,18 +12,6 @@
  */
 package com.phoenixnap.oss.ramlapisync.generation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.raml.model.Raml;
-import org.raml.parser.visitor.RamlDocumentBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.style.RamlStyleCheckVisitorCoordinator;
@@ -34,6 +22,13 @@ import com.phoenixnap.oss.ramlapisync.verification.RamlChecker;
 import com.phoenixnap.oss.ramlapisync.verification.RamlResourceVisitorCheck;
 import com.phoenixnap.oss.ramlapisync.verification.checkers.RamlCheckerResourceVisitorCoordinator;
 import com.phoenixnap.oss.ramlapisync.verification.checkers.ResourceExistenceChecker;
+import org.raml.model.Raml;
+import org.raml.parser.visitor.RamlDocumentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
+import java.util.*;
 
 /**
  * Engine that aims to compare RAML as loaded from a raml file that is published as our API contract with RAML generated from the Spring MVC implementation
@@ -48,7 +43,7 @@ public class RamlVerifier {
 	 * Class Logger
 	 */
 	protected static final Logger logger = LoggerFactory.getLogger(RamlVerifier.class);
-	
+
 	private Raml published;
 	private Raml implemented;
 	
@@ -90,7 +85,7 @@ public class RamlVerifier {
 		this.published = published;
 		this.implemented = implemented;
 		this.checkers = new ArrayList<>();
-		
+
 		if (implemented != null && StringUtils.hasText(implementedUrlPrefixToIgnore)) {
 			RamlHelper.removeResourceTree(implemented, implementedUrlPrefixToIgnore);
 		}

@@ -13,6 +13,7 @@
 package com.phoenixnap.oss.ramlapisync.naming;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
 import org.jsonschema2pojo.util.NameHelper;
 import org.raml.model.ActionType;
 import org.raml.model.Resource;
@@ -305,7 +306,7 @@ public class NamingHelper {
 	 * @return The java name of the method that will represent this Action
 	 */
 	public static String getActionName(Resource controllerizedResource, Resource resource, RamlAction action,
-			ActionType actionType) {
+			RamlActionType actionType) {
 		
 		String url = resource.getUri();
 		//Since this will be part of a resource/controller, remove the parent portion of the URL if enough details remain
@@ -391,7 +392,7 @@ public class NamingHelper {
 	 * @param isTargetCollection True if this action is being done on a collection or plural resource (eg: books)
 	 * @return
 	 */
-	private static String convertActionTypeToIntent(ActionType actionType, boolean isTargetCollection) {
+	private static String convertActionTypeToIntent(RamlActionType actionType, boolean isTargetCollection) {
 		switch (actionType) {
 			case DELETE : return "delete";
 			case GET : return "get";

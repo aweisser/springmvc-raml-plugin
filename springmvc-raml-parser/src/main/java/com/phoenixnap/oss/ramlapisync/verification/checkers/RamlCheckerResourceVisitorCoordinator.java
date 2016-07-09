@@ -13,7 +13,8 @@
 package com.phoenixnap.oss.ramlapisync.verification.checkers;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
-import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import com.phoenixnap.oss.ramlapisync.verification.*;
 import org.raml.model.Action;
 import org.raml.model.ActionType;
@@ -39,19 +40,23 @@ public class RamlCheckerResourceVisitorCoordinator implements RamlChecker {
 	 * Class Logger
 	 */
 	protected static final Logger logger = LoggerFactory.getLogger(RamlCheckerResourceVisitorCoordinator.class);
-	
-	
+
 	private Set<Issue> errors = new LinkedHashSet<>();
+
 	private Set<Issue> warnings = new LinkedHashSet<>();
 	
 	private List<RamlActionVisitorCheck> actionCheckers;
+
 	private List<RamlResourceVisitorCheck> resourceCheckers;
-	
-	public RamlCheckerResourceVisitorCoordinator (List<RamlActionVisitorCheck> actionCheckers, List<RamlResourceVisitorCheck> resourceCheckers) {		
+
+	private RamlModelFactory ramlModelFactory;
+
+	public RamlCheckerResourceVisitorCoordinator (List<RamlActionVisitorCheck> actionCheckers, List<RamlResourceVisitorCheck> resourceCheckers) {
 		this.actionCheckers = new ArrayList<>();
 		this.resourceCheckers = new ArrayList<>();
 		this.actionCheckers.addAll(actionCheckers);
-		this.resourceCheckers.addAll(resourceCheckers);	
+		this.resourceCheckers.addAll(resourceCheckers);
+		this.ramlModelFactory = RamlModelFactoryOfFactories.createRamlModelFactory();
 	}
 	
 	/**
@@ -137,14 +142,15 @@ public class RamlCheckerResourceVisitorCoordinator implements RamlChecker {
 				
 				Map<ActionType, Action> referenceActions = reference.getActions();
 				Map<ActionType, Action> targetActions = target.getActions();
+
 				if (referenceActions != null && referenceActions.size() > 0 && targetActions != null && targetActions.size() > 0) {
 					for (Entry<ActionType, Action> action : referenceActions.entrySet()) {
 						Action targetAction = targetActions.get(action.getKey());
-						String actionLocation = Issue.buildRamlLocation(reference, RamlAction.asRamlAction(referenceActions.get(action.getKey())), null);
+						String actionLocation = Issue.buildRamlLocation(reference, ramlModelFactory.createRamlAction(referenceActions.get(action.getKey())), null);
 						if (targetAction != null) {
 							logger.debug("Visiting action: "+ actionLocation);
 							for (RamlActionVisitorCheck actionCheck : actionCheckers) {
-								Pair<Set<Issue>, Set<Issue>> check = actionCheck.check(action.getKey(), RamlAction.asRamlAction(action.getValue()), RamlAction.asRamlAction(targetAction), location, severity);
+								Pair<Set<Issue>, Set<Issue>> check = actionCheck.check(action.getKey(), ramlModelFactory.createRamlAction(action.getValue()), ramlModelFactory.createRamlAction(targetAction), location, severity);
 								if (check != null && check.getFirst() != null) {
 									warnings.addAll(check.getFirst());
 								}

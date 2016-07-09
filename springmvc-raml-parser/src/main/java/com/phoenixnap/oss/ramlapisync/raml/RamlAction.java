@@ -1,6 +1,5 @@
 package com.phoenixnap.oss.ramlapisync.raml;
 
-import com.phoenixnap.oss.ramlapisync.raml.jrp08.Jrp08Action;
 import org.raml.model.*;
 import org.raml.model.parameter.QueryParameter;
 
@@ -12,16 +11,15 @@ import java.util.Map;
  */
 public interface RamlAction {
 
-    // TODO Remove this method and refactor
-    static RamlAction asRamlAction(Action action) {
-        return new Jrp08Action(action);
-    }
-
     Resource getResource();
+
+    void setResource(Resource resource);
 
     Map<String, QueryParameter> getQueryParameters();
 
     Map<String, MimeType> getBody();
+
+    void setBody(Map<String, MimeType> body);
 
     Map<String,Response> getResponses();
 
@@ -29,7 +27,12 @@ public interface RamlAction {
 
     String getDescription();
 
+    void setDescription(String description);
+
     ActionType getType();
 
+    void setType(RamlActionType type);
+
     List<SecurityReference> getSecuredBy();
+
 }

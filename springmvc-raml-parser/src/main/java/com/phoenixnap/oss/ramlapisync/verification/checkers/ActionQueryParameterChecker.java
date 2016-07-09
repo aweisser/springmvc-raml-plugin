@@ -15,6 +15,7 @@ package com.phoenixnap.oss.ramlapisync.verification.checkers;
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
 import com.phoenixnap.oss.ramlapisync.verification.*;
 import org.raml.model.ActionType;
 import org.raml.model.MimeType;
@@ -78,7 +79,7 @@ public class ActionQueryParameterChecker implements RamlActionVisitorCheck {
 							&& targetBody.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE) != null
 							&& targetBody.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters() != null
 							&& targetBody.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters().containsKey(cParam.getKey())
-							&& ResourceParser.doesActionTypeSupportRequestBody(reference.getType())) {
+							&& ResourceParser.doesActionTypeSupportRequestBody(RamlActionType.asRamlActionType(reference.getType()))) {
 					   issue = new Issue(IssueSeverity.WARNING, location, IssueType.MISSING, QUERY_PARAMETER_FOUND_IN_FORM , reference.getResource(), reference, cParam.getKey());
 					} else {
 					   issue = new Issue(targetSeverity, location, IssueType.MISSING, QUERY_PARAMETER_MISSING , reference.getResource(), reference, cParam.getKey());

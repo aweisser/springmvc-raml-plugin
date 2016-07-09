@@ -17,7 +17,7 @@ import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
-import org.raml.model.ActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
 import org.raml.model.MimeType;
 import org.raml.model.Resource;
 import org.raml.model.Response;
@@ -42,7 +42,7 @@ public class ApiActionMetadata {
 
 	ApiResourceMetadata parent;
 	Resource resource;
-	ActionType actionType;
+	RamlActionType actionType;
 	RamlAction action;
 
 	String requestBodyMime = null;
@@ -53,7 +53,7 @@ public class ApiActionMetadata {
 
 	private String responseContentTypeFilter;
 
-	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, ActionType actionType, RamlAction action, String responseContentTypeFilter) {
+	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, RamlActionType actionType, RamlAction action, String responseContentTypeFilter) {
 		super();
 		this.parent = parent;
 		this.resource = resource;
@@ -65,7 +65,7 @@ public class ApiActionMetadata {
 
 	}
 
-	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, ActionType actionType, RamlAction action) {
+	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, RamlActionType actionType, RamlAction action) {
 		this(parent, resource, actionType, action, null);
 	}
 
@@ -237,11 +237,11 @@ public class ApiActionMetadata {
 		this.resource = resource;
 	}
 
-	public ActionType getActionType() {
+	public RamlActionType getActionType() {
 		return actionType;
 	}
 
-	public void setActionType(ActionType actionType) {
+	public void setActionType(RamlActionType actionType) {
 		this.actionType = actionType;
 	}
 

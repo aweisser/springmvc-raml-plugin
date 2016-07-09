@@ -22,7 +22,7 @@ import com.phoenixnap.oss.ramlapisync.javadoc.JavaDocStore;
 import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.parser.FileSearcher;
 import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
-import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -70,7 +70,7 @@ public class SpringMvcResourceParserTest {
 
 	private void validateSimpleAjaxResponse(Action action) {
 		assertEquals(1, action.getResponses().size());
-		Response response = RamlHelper.getSuccessfulResponse(RamlAction.asRamlAction(action));
+		Response response = RamlHelper.getSuccessfulResponse(RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(action));
 		assertEquals("Checking return javadoc", RETURN_JAVADOC, response.getDescription());
 		assertEquals(1, response.getBody().size());
 		assertNotNull("Check Response is there", response.getBody().get(DEFAULT_MEDIA_TYPE));
@@ -79,7 +79,7 @@ public class SpringMvcResourceParserTest {
 	
 	private void validateMultipleResponse(Action action) {
 		assertEquals(1, action.getResponses().size());
-		Response response = RamlHelper.getSuccessfulResponse(RamlAction.asRamlAction(action));
+		Response response = RamlHelper.getSuccessfulResponse(RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(action));
 		assertEquals("Checking return javadoc", RETURN_JAVADOC, response.getDescription());
 		assertEquals(2, response.getBody().size());
 		assertNotNull("Check Response is there", response.getBody().get(MediaType.APPLICATION_JSON_VALUE));		
@@ -89,7 +89,7 @@ public class SpringMvcResourceParserTest {
 	@SuppressWarnings("unchecked")
 	@BeforeClass
 	public static void getResource() {
-		parser = new SpringMvcResourceParser(null, VERSION, DEFAULT_MEDIA_TYPE, false);
+		parser = new SpringMvcResourceParser(null, VERSION, DEFAULT_MEDIA_TYPE, false, RamlModelFactoryOfFactories.createRamlModelFactory());
 		JavaDocExtractor mockJavaDocExtractor = Mockito.mock(JavaDocExtractor.class);
 		JavaDocStore mockJavaDocStore = Mockito.mock(JavaDocStore.class);
 		JavaDocEntry mockJavaDocEntry = Mockito.mock(JavaDocEntry.class);

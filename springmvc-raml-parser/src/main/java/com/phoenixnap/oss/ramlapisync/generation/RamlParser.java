@@ -15,6 +15,8 @@ package com.phoenixnap.oss.ramlapisync.generation;
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
 import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import org.raml.model.*;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 import org.slf4j.Logger;
@@ -138,18 +140,19 @@ public class RamlParser {
 				//if we have multiple response types in the raml, this should produce different calls
 				Response response = null;
 
-				RamlAction action = RamlAction.asRamlAction(childResource.getValue());
+				RamlAction action = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(childResource.getValue());
 				if (action.getResponses() != null) {
 					response = RamlHelper.getSuccessfulResponse(action);
 				}
-				
+
+				RamlActionType actionType = RamlActionType.asRamlActionType(childResource.getKey());
 				if (seperateMethodsByContentType && response != null && response.hasBody() && response.getBody().size() > 1) {
 						for (String responseType : response.getBody().keySet()) {
-							controller.addApiCall(resource, childResource.getKey(), action, responseType);
+							controller.addApiCall(resource, actionType, action, responseType);
 						}
 					
 				} else {
-					controller.addApiCall(resource, childResource.getKey(), action);
+					controller.addApiCall(resource, actionType, action);
 				}
 			}
 		}

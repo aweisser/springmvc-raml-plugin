@@ -13,7 +13,7 @@
 package com.phoenixnap.oss.ramlapisync.style;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
-import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import com.phoenixnap.oss.ramlapisync.verification.*;
 import org.raml.model.Action;
 import org.raml.model.ActionType;
@@ -88,7 +88,7 @@ public class RamlStyleCheckVisitorCoordinator implements RamlChecker {
 				if (actions != null) {
 					for (Entry<ActionType, Action> actionEntry : actions.entrySet()) {
 						for (RamlStyleChecker checker : checkers) {
-							warnings.addAll(checker.checkActionStyle(actionEntry.getKey(), RamlAction.asRamlAction(actionEntry.getValue()), location, raml));
+							warnings.addAll(checker.checkActionStyle(actionEntry.getKey(), RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(actionEntry.getValue()), location, raml));
 						}
 						
 						/*
