@@ -30,6 +30,6 @@ public class Jrp08RamlModelFactory implements RamlModelFactory {
         action.setResponses(ramlAction.getResponses());
         action.setSecuredBy(ramlAction.getSecuredBy());
         action.setType(ramlAction.getType());
-        return null;
+        return action;
     }
 }
