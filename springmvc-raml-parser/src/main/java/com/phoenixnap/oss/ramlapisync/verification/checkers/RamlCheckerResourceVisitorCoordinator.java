@@ -13,18 +13,29 @@
 package com.phoenixnap.oss.ramlapisync.verification.checkers;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
-import com.phoenixnap.oss.ramlapisync.verification.*;
-import org.raml.model.Action;
-import org.raml.model.ActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
+import com.phoenixnap.oss.ramlapisync.verification.Issue;
+import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
+import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
+import com.phoenixnap.oss.ramlapisync.verification.IssueType;
+import com.phoenixnap.oss.ramlapisync.verification.RamlActionVisitorCheck;
+import com.phoenixnap.oss.ramlapisync.verification.RamlChecker;
+import com.phoenixnap.oss.ramlapisync.verification.RamlResourceVisitorCheck;
 import org.raml.model.Raml;
-import org.raml.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Raml checker that cross checks Resources between 2 RAML models. Only directly corresponding resources will be parsed 
@@ -83,35 +94,39 @@ public class RamlCheckerResourceVisitorCoordinator implements RamlChecker {
 		if (actionCheckers.size() == 0 && resourceCheckers.size() == 0) {
 			return new Pair<Set<Issue>, Set<Issue>>(Collections.emptySet(), Collections.emptySet());
 		}
-		
+
+		RamlModelFactory ramlModelFactory = RamlModelFactoryOfFactories.createRamlModelFactory();
+
 		logger.info("Performing Resource and Action Visitor Checks");
 		if (published != null && implemented == null) {
 			errors.add(new Issue(IssueSeverity.ERROR, IssueLocation.CONTRACT, IssueType.MISSING, "Completely Missing Implementation for RAML file", "/"));
 		} else if (published == null && implemented != null) {
 			errors.add(new Issue(IssueSeverity.ERROR, IssueLocation.SOURCE, IssueType.MISSING, "Completely Missing RAML file", "/"));
 		} else {
+			Map<String, RamlResource> publishedResources = ramlModelFactory.createRamlResources(published.getResources());
+			Map<String, RamlResource> implementedResources = ramlModelFactory.createRamlResources(implemented.getResources());
+
 			logger.debug("Checking resources using contract as reference. Warnings only");
 			// First Check for missing in implementation
-			check(published.getResources(), implemented.getResources(), IssueLocation.SOURCE, IssueSeverity.ERROR);
-			
+			check(publishedResources, implementedResources, IssueLocation.SOURCE, IssueSeverity.ERROR);
 			logger.debug("Checking resources using implementation as reference. Warnings only");
 			// Now check for missing in contract
-			check(implemented.getResources(), published.getResources(), IssueLocation.CONTRACT, IssueSeverity.WARNING);
+			check(implementedResources, publishedResources, IssueLocation.CONTRACT, IssueSeverity.WARNING);
 		}
 		
 		return new Pair<Set<Issue>, Set<Issue>>(warnings, errors);
 		
 	}
 
-	private void check(Map<String, Resource> referenceResourcesMap, Map<String, Resource> targetResourcesMap, IssueLocation location, IssueSeverity severity) {
+	private void check(Map<String, RamlResource> referenceResourcesMap, Map<String, RamlResource> targetResourcesMap, IssueLocation location, IssueSeverity severity) {
 		Set<String> referenceResources = referenceResourcesMap != null ? referenceResourcesMap.keySet() : Collections.<String>emptySet() ;
 		Set<String> targetResources = targetResourcesMap != null ? targetResourcesMap.keySet() : Collections.<String>emptySet();
 		
 		
 		for (String resource : referenceResources) {			
-			Resource reference = referenceResourcesMap.get(resource);
+			RamlResource reference = referenceResourcesMap.get(resource);
 			String resourceLocation = Issue.buildRamlLocation(reference, null, null);
-			Resource target = null;
+			RamlResource target = null;
 			if (targetResources.contains(resource)) {
 				logger.debug("Visiting resource: "+ resourceLocation + " in " + (location.equals(IssueLocation.SOURCE) ? IssueLocation.CONTRACT : IssueLocation.SOURCE)); 
 				target = targetResourcesMap.get(resource);
@@ -140,17 +155,17 @@ public class RamlCheckerResourceVisitorCoordinator implements RamlChecker {
 					}
 				}
 				
-				Map<ActionType, Action> referenceActions = reference.getActions();
-				Map<ActionType, Action> targetActions = target.getActions();
+				Map<RamlActionType, RamlAction> referenceActions = reference.getActions();
+				Map<RamlActionType, RamlAction> targetActions = target.getActions();
 
 				if (referenceActions != null && referenceActions.size() > 0 && targetActions != null && targetActions.size() > 0) {
-					for (Entry<ActionType, Action> action : referenceActions.entrySet()) {
-						Action targetAction = targetActions.get(action.getKey());
-						String actionLocation = Issue.buildRamlLocation(reference, ramlModelFactory.createRamlAction(referenceActions.get(action.getKey())), null);
+					for (Entry<RamlActionType, RamlAction> action : referenceActions.entrySet()) {
+						RamlAction targetAction = targetActions.get(action.getKey());
+						String actionLocation = Issue.buildRamlLocation(reference, referenceActions.get(action.getKey()), null);
 						if (targetAction != null) {
 							logger.debug("Visiting action: "+ actionLocation);
 							for (RamlActionVisitorCheck actionCheck : actionCheckers) {
-								Pair<Set<Issue>, Set<Issue>> check = actionCheck.check(action.getKey(), ramlModelFactory.createRamlAction(action.getValue()), ramlModelFactory.createRamlAction(targetAction), location, severity);
+								Pair<Set<Issue>, Set<Issue>> check = actionCheck.check(action.getKey(), action.getValue(), targetAction, location, severity);
 								if (check != null && check.getFirst() != null) {
 									warnings.addAll(check.getFirst());
 								}

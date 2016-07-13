@@ -18,16 +18,21 @@ import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.raml.model.MimeType;
-import org.raml.model.Resource;
 import org.raml.model.Response;
 import org.raml.model.parameter.FormParameter;
 import org.raml.model.parameter.UriParameter;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -41,7 +46,7 @@ import java.util.stream.Collectors;
 public class ApiActionMetadata {
 
 	ApiResourceMetadata parent;
-	Resource resource;
+	RamlResource resource;
 	RamlActionType actionType;
 	RamlAction action;
 
@@ -53,7 +58,7 @@ public class ApiActionMetadata {
 
 	private String responseContentTypeFilter;
 
-	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, RamlActionType actionType, RamlAction action, String responseContentTypeFilter) {
+	public ApiActionMetadata(ApiResourceMetadata parent, RamlResource resource, RamlActionType actionType, RamlAction action, String responseContentTypeFilter) {
 		super();
 		this.parent = parent;
 		this.resource = resource;
@@ -65,7 +70,7 @@ public class ApiActionMetadata {
 
 	}
 
-	public ApiActionMetadata(ApiResourceMetadata parent, Resource resource, RamlActionType actionType, RamlAction action) {
+	public ApiActionMetadata(ApiResourceMetadata parent, RamlResource resource, RamlActionType actionType, RamlAction action) {
 		this(parent, resource, actionType, action, null);
 	}
 
@@ -83,7 +88,7 @@ public class ApiActionMetadata {
 		}
 		pathVariables = new LinkedHashSet<>();
 
-		Resource targetResource = action.getResource();
+		RamlResource targetResource = action.getResource();
 
 		do {
 			for (Entry<String, UriParameter> param : targetResource.getUriParameters().entrySet()) {
@@ -229,11 +234,11 @@ public class ApiActionMetadata {
 		this.parent = parent;
 	}
 
-	public Resource getResource() {
+	public RamlResource getResource() {
 		return resource;
 	}
 
-	public void setResource(Resource resource) {
+	public void setResource(RamlResource resource) {
 		this.resource = resource;
 	}
 

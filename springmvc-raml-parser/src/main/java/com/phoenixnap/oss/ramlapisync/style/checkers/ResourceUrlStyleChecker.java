@@ -12,20 +12,19 @@
  */
 package com.phoenixnap.oss.ramlapisync.style.checkers;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.CharUtils;
-import org.raml.model.Raml;
-import org.raml.model.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import com.phoenixnap.oss.ramlapisync.style.RamlStyleCheckerAdapter;
 import com.phoenixnap.oss.ramlapisync.style.StyleIssue;
 import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
+import org.apache.commons.lang.CharUtils;
+import org.raml.model.Raml;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Style checker that ensures that certain characters are not used in resource URLs
@@ -47,7 +46,7 @@ public class ResourceUrlStyleChecker extends RamlStyleCheckerAdapter {
 	public static String CAPITALISED_RESOURCE = "Resource URLs Should not be capitalized";
 	
 	@Override
-	public Set<StyleIssue> checkResourceStyle(String name, Resource resource,
+	public Set<StyleIssue> checkResourceStyle(String name, RamlResource resource,
 			IssueLocation location, Raml raml) {
 		logger.debug("Checking resource " + name);
 		Set<StyleIssue> issues = new LinkedHashSet<>();

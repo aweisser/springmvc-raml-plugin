@@ -12,27 +12,9 @@
  */
 package com.phoenixnap.oss.ramlapisync.generation.rules.spring;
 
-import static com.phoenixnap.oss.ramlapisync.generation.CodeModelHelper.findFirstClassBySimpleName;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import com.google.common.base.CaseFormat;
-import com.phoenixnap.oss.ramlapisync.data.ApiBodyMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
+import com.phoenixnap.oss.ramlapisync.data.ApiBodyMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiParameterMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.CodeModelHelper;
 import com.phoenixnap.oss.ramlapisync.generation.rules.Rule;
@@ -45,6 +27,23 @@ import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.phoenixnap.oss.ramlapisync.generation.CodeModelHelper.findFirstClassBySimpleName;
 
 /**
  * Generates a method body that calls the rest template to execute a REST call. 
@@ -160,7 +159,11 @@ public class SpringRestClientMethodBodyRule implements Rule<CodeModelHelper.JExt
         if (!CollectionUtils.isEmpty(endpointMetadata.getRequestParameters())) {
             //iterate over the parameters and add calls to .queryParam
             for (ApiParameterMetadata parameter : endpointMetadata.getRequestParameters()) {
-            	builderInit = builderInit.invoke("queryParam").arg(parameter.getName()).arg(methodParamMap.get(parameter.getName()));
+                String parameterName = parameter.getName();
+                JVar arg = methodParamMap.get(parameterName);
+                JInvocation queryParam = builderInit.invoke("queryParam");
+                JInvocation arg1 = queryParam.arg(parameterName);
+                builderInit = arg1.arg(arg);
             }         
         }
         //Add these to the code model

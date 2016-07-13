@@ -26,23 +26,34 @@ import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
-import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
-import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
-import org.raml.model.*;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
+import org.raml.model.MimeType;
+import org.raml.model.ParamType;
+import org.raml.model.Response;
 import org.raml.model.parameter.FormParameter;
 import org.raml.model.parameter.UriParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Service scanner that handles generation from a Spring MVC codebase
@@ -60,8 +71,8 @@ public class SpringMvcResourceParser extends ResourceParser {
 	 */
 	protected boolean restrictOnMediaType;
 
-	public SpringMvcResourceParser(File path, String version, String defaultMediaType, boolean restrictOnMediaType, RamlModelFactory ramlModelFactory) {
-		super(path, version, defaultMediaType, ramlModelFactory);
+	public SpringMvcResourceParser(File path, String version, String defaultMediaType, boolean restrictOnMediaType) {
+		super(path, version, defaultMediaType);
 		this.restrictOnMediaType = restrictOnMediaType;
 	}
 
@@ -414,7 +425,7 @@ public class SpringMvcResourceParser extends ResourceParser {
 	}
 
 	@Override
-	protected void extractAndAppendResourceInfo(Method method, JavaDocEntry docEntry, Resource parentResource) {
+	protected void extractAndAppendResourceInfo(Method method, JavaDocEntry docEntry, RamlResource parentResource) {
 
 		Map<RamlActionType, String> methodActions = getHttpMethodAndName(method);
 		for (Entry<RamlActionType, String> methodAction : methodActions.entrySet()) {
@@ -450,8 +461,8 @@ public class SpringMvcResourceParser extends ResourceParser {
 			}
 			action.getResponses().put("200", response);
 
-			Resource idResource = null;
-			Resource leafResource = null;
+			RamlResource idResource = null;
+			RamlResource leafResource = null;
 			ApiParameterMetadata[] resourceIdParameters = extractResourceIdParameter(method);
 			Map<String, ApiParameterMetadata> resourceIdParameterMap = new HashMap<>();
 			for (ApiParameterMetadata apiParameterMetadata : resourceIdParameters) {
@@ -474,7 +485,7 @@ public class SpringMvcResourceParser extends ResourceParser {
 																	// contains a resource
 
 				if (idResource == null) {
-					idResource = new Resource();
+					idResource = ramlModelFactory.createRamlResource();
 					idResource.setRelativeUri(resourceName);
 					String displayName = StringUtils.capitalize(partialUrl) + " Resource";
 					String resourceDescription = displayName;
@@ -520,7 +531,7 @@ public class SpringMvcResourceParser extends ResourceParser {
 			}
 
 			// Resources have been created. lets bind the action to the appropriate one
-			Resource actionTargetResource;
+			RamlResource actionTargetResource;
 			if (idResource != null) {
 				actionTargetResource = idResource;
 			} else if (leafResource != null) {
@@ -532,12 +543,11 @@ public class SpringMvcResourceParser extends ResourceParser {
 			action.setType(apiActionType);
 			if (actionTargetResource.getActions().containsKey(apiActionType)) {
 				//merge action
-				ActionType actionType = RamlActionType.asActionType(apiActionType); // TODO remove this when Resource becomes RamlResource
-				RamlAction existingAction = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(actionTargetResource.getActions().get(actionType));
+				RamlAction existingAction = actionTargetResource.getActions().get(apiActionType);
 				RamlHelper.mergeActions(existingAction, action);
 				
 			} else {
-				actionTargetResource.getActions().put(RamlActionType.asActionType(apiActionType), ramlModelFactory.createAction(action));
+				actionTargetResource.getActions().put(apiActionType, action);
 			}
 		}
 

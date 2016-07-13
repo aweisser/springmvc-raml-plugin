@@ -15,11 +15,9 @@ package test.phoenixnap.oss.plugin.naming;
 import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiParameterMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
-import com.phoenixnap.oss.ramlapisync.generation.RamlGenerator;
 import com.phoenixnap.oss.ramlapisync.generation.RamlParser;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
-import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import org.junit.Test;
 import org.raml.model.Raml;
 
@@ -36,8 +34,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class BugfixTest {
 
-	SpringMvcResourceParser parser = new SpringMvcResourceParser(null, "0.0.1", ResourceParser.CATCH_ALL_MEDIA_TYPE, false, RamlModelFactoryOfFactories.createRamlModelFactory());
-	RamlGenerator generator = new RamlGenerator(parser);
+	SpringMvcResourceParser parser = new SpringMvcResourceParser(null, "0.0.1", ResourceParser.CATCH_ALL_MEDIA_TYPE, false);
 
 	@Test
 	public void test_Issue15_MissingQueryParameters() {

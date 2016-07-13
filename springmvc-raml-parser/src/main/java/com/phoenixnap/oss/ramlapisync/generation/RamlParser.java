@@ -17,12 +17,15 @@ import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
-import org.raml.model.*;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
+import org.raml.model.Raml;
+import org.raml.model.Response;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -89,14 +92,15 @@ public class RamlParser {
 		//Iterate on all parent resources
 		//if we have child resources, just append the url and go down the chain until we hit the first action.
 		//if an action is found we need to 
-		for (Entry<String, Resource> resource : raml.getResources().entrySet()) {
+		Map<String, RamlResource> resources = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlResources(raml.getResources());
+		for (Entry<String, RamlResource> resource : resources.entrySet()) {
 			controllers.addAll(checkResource(startUrl, resource.getValue(), null, raml));
 		}
 		
 		return controllers;
 	}
 	
-	private boolean shouldCreateController (Resource resource) {
+	private boolean shouldCreateController (RamlResource resource) {
 		
 		//If controller has actions create it
 		if (resource.getActions() != null && !resource.getActions().isEmpty()) {
@@ -105,7 +109,7 @@ public class RamlParser {
 		
 		//Lookahead to child resource - if the child has a uriParameter then it's likely that we are at a good resource depth
 		if (resource.getResources() != null &&  !resource.getResources().isEmpty()) {
-			for (Resource childResource : resource.getResources().values()) {				
+			for (RamlResource childResource : resource.getResources().values()) {
 				if (childResource.getUriParameters() != null && !childResource.getUriParameters().isEmpty() 
 						|| (childResource.getResolvedUriParameters() != null && !childResource.getResolvedUriParameters().isEmpty())) {
 					return true;
@@ -126,7 +130,7 @@ public class RamlParser {
 	 * @param document The raml Document being parse
 	 * @return A set of Controllers representing resources in this branch of the tree
 	 */
-	public Set<ApiResourceMetadata> checkResource(String baseUrl, Resource resource, ApiResourceMetadata controller, Raml document) {
+	public Set<ApiResourceMetadata> checkResource(String baseUrl, RamlResource resource, ApiResourceMetadata controller, Raml document) {
 		Set<ApiResourceMetadata> controllers = new LinkedHashSet<>();
 		//append resource URL to url.
 		String url = baseUrl + resource.getRelativeUri();
@@ -136,16 +140,16 @@ public class RamlParser {
 		}
 		//extract actions for this resource
 		if (resource.getActions() != null && !resource.getActions().isEmpty()) {			
-			for (Entry<ActionType, Action> childResource : resource.getActions().entrySet()) {
+			for (Entry<RamlActionType, RamlAction> childResource : resource.getActions().entrySet()) {
 				//if we have multiple response types in the raml, this should produce different calls
 				Response response = null;
 
-				RamlAction action = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(childResource.getValue());
+				RamlAction action = childResource.getValue();
 				if (action.getResponses() != null) {
 					response = RamlHelper.getSuccessfulResponse(action);
 				}
 
-				RamlActionType actionType = RamlActionType.asRamlActionType(childResource.getKey());
+				RamlActionType actionType = childResource.getKey();
 				if (seperateMethodsByContentType && response != null && response.hasBody() && response.getBody().size() > 1) {
 						for (String responseType : response.getBody().keySet()) {
 							controller.addApiCall(resource, actionType, action, responseType);
@@ -157,7 +161,7 @@ public class RamlParser {
 			}
 		}
 		if (resource.getResources() != null &&  !resource.getResources().isEmpty()) {
-			for (Entry<String, Resource> childResource : resource.getResources().entrySet()) {
+			for (Entry<String, RamlResource> childResource : resource.getResources().entrySet()) {
 				controllers.addAll(checkResource(url, childResource.getValue(), controller,document));
 			}
 		}

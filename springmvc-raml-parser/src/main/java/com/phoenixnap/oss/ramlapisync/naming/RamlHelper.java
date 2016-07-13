@@ -10,9 +10,11 @@
 package com.phoenixnap.oss.ramlapisync.naming;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.raml.model.MimeType;
 import org.raml.model.Raml;
-import org.raml.model.Resource;
 import org.raml.model.Response;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -28,16 +30,18 @@ import java.util.Map.Entry;
  *
  */
 public class RamlHelper {
-	
+
+	private static RamlModelFactory ramlModelFactory = RamlModelFactoryOfFactories.createRamlModelFactory();
+
 	/**
 	 * Tree merging algorithm, if a resource already exists it will not overwrite and add all children to the existing resource 
 	 * @param existing The existing resource in the model
 	 * @param resource The resource to merge in
 	 * @param addActions If true it will copy all actions even if the resource itself isnt copied
 	 */
-	public static void mergeResources(Resource existing, Resource resource, boolean addActions) {	
-		Map<String, Resource> existingChildResources = existing.getResources();
-		Map<String, Resource> newChildResources = resource.getResources();
+	public static void mergeResources(RamlResource existing, RamlResource resource, boolean addActions) {
+		Map<String, RamlResource> existingChildResources = existing.getResources();
+		Map<String, RamlResource> newChildResources = resource.getResources();
 		for (String newChildKey : newChildResources.keySet()) {
 			if (!existingChildResources.containsKey(newChildKey)) {
 				existingChildResources.put(newChildKey, newChildResources.get(newChildKey));
@@ -58,10 +62,10 @@ public class RamlHelper {
 	 * @param resource The candidate resource
 	 * @param addActions whether we should add actions
 	 */
-	public static void mergeResources(Raml raml, Resource resource, boolean addActions) {
-		Resource existingResource = raml.getResource(resource.getRelativeUri());
+	public static void mergeResources(Raml raml, RamlResource resource, boolean addActions) {
+		RamlResource existingResource = ramlModelFactory.createRamlResource(raml.getResource(resource.getRelativeUri()));
 		if (existingResource == null) {
-			raml.getResources().put(resource.getRelativeUri(), resource);
+			raml.getResources().put(resource.getRelativeUri(), ramlModelFactory.createResource(resource));
 		} else {
 			mergeResources(existingResource, resource, addActions);
 		}
@@ -117,7 +121,7 @@ public class RamlHelper {
 		if (StringUtils.hasText(urlPrefixToIgnore)) {
 			String[] urlParts = urlPrefixToIgnore.split("/");
 			String firstResourcePart = null;
-			Resource pointerResource = null;
+			RamlResource pointerResource = null;
 			for(String part : urlParts) {
 				if (StringUtils.hasText(part)) {
 					
@@ -125,9 +129,11 @@ public class RamlHelper {
 						pointerResource = pointerResource.getResource("/"+part);
 					} else {
 						if (model.getResources().get("/") != null) {
-							pointerResource = model.getResource("/").getResource("/"+part); //skip root node
+							// TODO remove transformation when Raml has a generic interface
+							pointerResource = ramlModelFactory.createRamlResource(model.getResource("/").getResource("/"+part)); //skip root node
 						} else {
-							pointerResource = model.getResource("/"+part);
+							// TODO remove transformation when Raml has a generic interface
+							pointerResource = ramlModelFactory.createRamlResource(model.getResource("/"+part));
 						}
 					}
 					
@@ -140,11 +146,13 @@ public class RamlHelper {
 				}
 			}
 			
-			Map<String,Resource> resources;
+			Map<String, RamlResource> resources;
 			if (model.getResource("/") != null) {
-				resources = model.getResource("/").getResources();
+				// TODO remove transformation when Raml has a generic interface
+				resources = ramlModelFactory.createRamlResources(model.getResource("/").getResources());
 			} else {
-				resources = model.getResources();
+				// TODO remove transformation when Raml has a generic interface
+				resources = ramlModelFactory.createRamlResources(model.getResources());
 			}
 			resources.remove(firstResourcePart);
 			
@@ -164,8 +172,8 @@ public class RamlHelper {
 	 * @param resources resources to check
 	 * @param urlPrefixToIgnore uri to remove
 	 */
-	private static void removeUri(Map<String, Resource> resources, String urlPrefixToIgnore) {
-		for (Resource resource : resources.values()) {
+	private static void removeUri(Map<String, RamlResource> resources, String urlPrefixToIgnore) {
+		for (RamlResource resource : resources.values()) {
 			resource.setParentUri(resource.getParentUri().replace(urlPrefixToIgnore, ""));
 			resource.setRelativeUri(resource.getRelativeUri().replace(urlPrefixToIgnore, ""));
 			removeUri(resource.getResources(), urlPrefixToIgnore);

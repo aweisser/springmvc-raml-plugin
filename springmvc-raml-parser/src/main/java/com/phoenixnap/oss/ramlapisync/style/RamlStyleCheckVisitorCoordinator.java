@@ -13,17 +13,27 @@
 package com.phoenixnap.oss.ramlapisync.style;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
-import com.phoenixnap.oss.ramlapisync.verification.*;
-import org.raml.model.Action;
-import org.raml.model.ActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
+import com.phoenixnap.oss.ramlapisync.verification.Issue;
+import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
+import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
+import com.phoenixnap.oss.ramlapisync.verification.IssueType;
+import com.phoenixnap.oss.ramlapisync.verification.RamlChecker;
 import org.raml.model.Raml;
-import org.raml.model.Resource;
 import org.raml.model.parameter.QueryParameter;
 import org.raml.model.parameter.UriParameter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Provides a Vistor pattern approach to Style Checks. Iterates through the model and invokes callbacks on specific checkers.
@@ -56,10 +66,11 @@ public class RamlStyleCheckVisitorCoordinator implements RamlChecker {
 	 * @return A pair containing a list of Warnings and an empty list of Errors (as first and second respectively)
 	 */
 	public Pair<Set<Issue>, Set<Issue>> check (Raml published, Raml implemented) {
-		
-		checkChildren(published.getResources(), published, IssueLocation.CONTRACT);
+
+		RamlModelFactory ramlModelFactory = RamlModelFactoryOfFactories.createRamlModelFactory();
+		checkChildren(ramlModelFactory.createRamlResources(published.getResources()), published, IssueLocation.CONTRACT);
 		if (!ignoreCodeStyle && implemented != null) {
-			checkChildren(implemented.getResources(), implemented, IssueLocation.SOURCE);
+			checkChildren(ramlModelFactory.createRamlResources(implemented.getResources()), implemented, IssueLocation.SOURCE);
 		}
 		
 		return new Pair<Set<Issue>, Set<Issue>>(warnings, Collections.emptySet());		
@@ -67,10 +78,10 @@ public class RamlStyleCheckVisitorCoordinator implements RamlChecker {
 
 
 
-	private void checkChildren(Map<String, Resource> resources, Raml raml, IssueLocation location) {
+	private void checkChildren(Map<String, RamlResource> resources, Raml raml, IssueLocation location) {
 		if (resources != null) {
-			for (Entry<String, Resource> entry : resources.entrySet()) {
-				Resource resource = entry.getValue();
+			for (Entry<String, RamlResource> entry : resources.entrySet()) {
+				RamlResource resource = entry.getValue();
 				for (RamlStyleChecker checker : checkers) {
 					warnings.addAll(checker.checkResourceStyle(entry.getKey(), resource, location, raml));
 				}
@@ -84,11 +95,11 @@ public class RamlStyleCheckVisitorCoordinator implements RamlChecker {
 					}
 				}
 				
-				Map<ActionType, Action> actions = resource.getActions();
+				Map<RamlActionType, RamlAction> actions = resource.getActions();
 				if (actions != null) {
-					for (Entry<ActionType, Action> actionEntry : actions.entrySet()) {
+					for (Entry<RamlActionType, RamlAction> actionEntry : actions.entrySet()) {
 						for (RamlStyleChecker checker : checkers) {
-							warnings.addAll(checker.checkActionStyle(actionEntry.getKey(), RamlModelFactoryOfFactories.createRamlModelFactory().createRamlAction(actionEntry.getValue()), location, raml));
+							warnings.addAll(checker.checkActionStyle(actionEntry.getKey(), actionEntry.getValue(), location, raml));
 						}
 						
 						/*

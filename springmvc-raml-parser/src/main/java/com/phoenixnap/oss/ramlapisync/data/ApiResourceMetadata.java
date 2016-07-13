@@ -15,8 +15,8 @@ package com.phoenixnap.oss.ramlapisync.data;
 import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.raml.model.Raml;
-import org.raml.model.Resource;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -36,13 +36,13 @@ public class ApiResourceMetadata {
 	public static final String CONTROLLER_SUFFIX = "Controller";
 	
 	private String controllerUrl;
-	private transient Resource resource;
+	private transient RamlResource resource;
 	private String basePackage;
 	private Raml document;
 	
 	Set<ApiActionMetadata> apiCalls = new LinkedHashSet<>();
 	
-	public ApiResourceMetadata(String controllerUrl, Resource resource, String basePackage, Raml document) {
+	public ApiResourceMetadata(String controllerUrl, RamlResource resource, String basePackage, Raml document) {
 		super();
 		this.controllerUrl = controllerUrl;
 		this.resource = resource;
@@ -51,11 +51,11 @@ public class ApiResourceMetadata {
 	} 
 	
 	
-	public void addApiCall(Resource resource, RamlActionType actionType, RamlAction action) {
+	public void addApiCall(RamlResource resource, RamlActionType actionType, RamlAction action) {
 		apiCalls.add(new ApiActionMetadata(this, resource, actionType, action));
 	}
 	
-	public void addApiCall(Resource resource, RamlActionType actionType, RamlAction action, String responseContentType) {
+	public void addApiCall(RamlResource resource, RamlActionType actionType, RamlAction action, String responseContentType) {
 		apiCalls.add(new ApiActionMetadata(this, resource, actionType, action, responseContentType));
 	}
 	
@@ -73,7 +73,7 @@ public class ApiResourceMetadata {
     }
 
 
-	public Resource getResource() {
+	public RamlResource getResource() {
 		return resource;
 	}
 	

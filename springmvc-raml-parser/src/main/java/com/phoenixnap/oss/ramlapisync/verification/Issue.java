@@ -13,7 +13,7 @@
 package com.phoenixnap.oss.ramlapisync.verification;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
-import org.raml.model.Resource;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.springframework.util.StringUtils;
 
 /**
@@ -31,12 +31,12 @@ public class Issue {
 
 	private String description;
 	private String ramlLocation;
-	private Resource resourceLocation;
+	private RamlResource resourceLocation;
 	private RamlAction action;
 	private String parameter;
 	
 	public Issue(IssueSeverity severity, IssueLocation location, IssueType type,
-			String description, Resource resource, RamlAction action, String parameter) {
+			String description, RamlResource resource, RamlAction action, String parameter) {
 		super();
 		this.severity = severity;
 		this.location = location;
@@ -48,7 +48,7 @@ public class Issue {
 	}
 
 	public Issue(IssueSeverity severity, IssueLocation location, IssueType type,
-			String description, Resource resource, RamlAction action) {
+				 String description, RamlResource resource, RamlAction action) {
 		this(severity, location, type, description, resource, action, null);
 	}
 
@@ -74,7 +74,7 @@ public class Issue {
 	 * @param parameter The parameter name that this Issue Relates to
 	 * @return String identifying the location of this issue
 	 */
-	public static String buildRamlLocation(Resource resource, RamlAction action, String parameter) {
+	public static String buildRamlLocation(RamlResource resource, RamlAction action, String parameter) {
 		String outLocation = resource.getUri();
 		if (action != null && action.getType() != null) {
 			outLocation = action.getType().name() + " " + outLocation;
@@ -114,7 +114,7 @@ public class Issue {
 		return ramlLocation;
 	}
 
-	public Resource getResourceLocation() {
+	public RamlResource getResourceLocation() {
 		return resourceLocation;
 	}
 

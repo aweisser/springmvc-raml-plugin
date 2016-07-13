@@ -14,20 +14,38 @@ import com.phoenixnap.oss.ramlapisync.generation.RamlGenerator;
 import com.phoenixnap.oss.ramlapisync.generation.RamlVerifier;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
-import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import com.phoenixnap.oss.ramlapisync.verification.Issue;
 import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
 import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
 import com.phoenixnap.oss.ramlapisync.verification.IssueType;
-import com.phoenixnap.oss.ramlapisync.verification.checkers.*;
+import com.phoenixnap.oss.ramlapisync.verification.checkers.ActionContentTypeChecker;
+import com.phoenixnap.oss.ramlapisync.verification.checkers.ActionExistenceChecker;
+import com.phoenixnap.oss.ramlapisync.verification.checkers.ActionQueryParameterChecker;
+import com.phoenixnap.oss.ramlapisync.verification.checkers.ActionResponseBodySchemaChecker;
+import com.phoenixnap.oss.ramlapisync.verification.checkers.ResourceExistenceChecker;
 import org.junit.Test;
 import org.raml.model.Raml;
-import test.phoenixnap.oss.plugin.naming.testclasses.*;
+import test.phoenixnap.oss.plugin.naming.testclasses.ContentTypeTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.MultiContentTypeTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.ParamTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.ParamTestControllerDowngradeToWarning;
+import test.phoenixnap.oss.plugin.naming.testclasses.ParamTestControllerPostMissing;
+import test.phoenixnap.oss.plugin.naming.testclasses.ParamTestControllerPostWarning;
+import test.phoenixnap.oss.plugin.naming.testclasses.ResponseBodyTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.ResponseBodyTestControllerError;
+import test.phoenixnap.oss.plugin.naming.testclasses.SecondVerifierTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.StyleCheckResourceDuplicateCommand;
+import test.phoenixnap.oss.plugin.naming.testclasses.StyleCheckResourceDuplicateCommandSecond;
+import test.phoenixnap.oss.plugin.naming.testclasses.ThirdVerifierTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.VerifierTestController;
+import test.phoenixnap.oss.plugin.naming.testclasses.VerifierUriParamTestController;
 
 import java.util.Collections;
 import java.util.Iterator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 
@@ -40,7 +58,7 @@ import static org.junit.Assert.*;
  */
 public class RamlVerifierTest {
 
-	SpringMvcResourceParser parser = new SpringMvcResourceParser(null, "0.0.1", ResourceParser.CATCH_ALL_MEDIA_TYPE, false, RamlModelFactoryOfFactories.createRamlModelFactory());
+	SpringMvcResourceParser parser = new SpringMvcResourceParser(null, "0.0.1", ResourceParser.CATCH_ALL_MEDIA_TYPE, false);
 	RamlGenerator generator = new RamlGenerator(parser);
 
 

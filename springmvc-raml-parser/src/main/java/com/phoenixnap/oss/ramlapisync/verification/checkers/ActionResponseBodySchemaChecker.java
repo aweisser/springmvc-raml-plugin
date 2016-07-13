@@ -14,12 +14,21 @@ package com.phoenixnap.oss.ramlapisync.verification.checkers;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
-import com.phoenixnap.oss.ramlapisync.verification.*;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.verification.Issue;
+import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
+import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
+import com.phoenixnap.oss.ramlapisync.verification.IssueType;
+import com.phoenixnap.oss.ramlapisync.verification.RamlActionVisitorCheck;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JFieldVar;
-import org.jsonschema2pojo.*;
+import org.jsonschema2pojo.DefaultGenerationConfig;
+import org.jsonschema2pojo.GenerationConfig;
+import org.jsonschema2pojo.Jackson2Annotator;
+import org.jsonschema2pojo.SchemaGenerator;
+import org.jsonschema2pojo.SchemaMapper;
+import org.jsonschema2pojo.SchemaStore;
 import org.jsonschema2pojo.rules.RuleFactory;
-import org.raml.model.ActionType;
 import org.raml.model.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +61,7 @@ public class ActionResponseBodySchemaChecker implements RamlActionVisitorCheck {
 	protected static final Logger logger = LoggerFactory.getLogger(ActionResponseBodySchemaChecker.class);
 
 	@Override
-	public Pair<Set<Issue>, Set<Issue>> check(ActionType name, RamlAction reference, RamlAction target, IssueLocation location, IssueSeverity maxSeverity) {
+	public Pair<Set<Issue>, Set<Issue>> check(RamlActionType name, RamlAction reference, RamlAction target, IssueLocation location, IssueSeverity maxSeverity) {
 		logger.debug("Checking action " + name);
 		Set<Issue> errors = new LinkedHashSet<>();
 		Set<Issue> warnings = new LinkedHashSet<>();

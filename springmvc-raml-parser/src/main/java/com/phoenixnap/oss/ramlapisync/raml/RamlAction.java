@@ -1,6 +1,8 @@
 package com.phoenixnap.oss.ramlapisync.raml;
 
-import org.raml.model.*;
+import org.raml.model.MimeType;
+import org.raml.model.Response;
+import org.raml.model.SecurityReference;
 import org.raml.model.parameter.QueryParameter;
 
 import java.util.List;
@@ -11,9 +13,9 @@ import java.util.Map;
  */
 public interface RamlAction {
 
-    Resource getResource();
+    RamlResource getResource();
 
-    void setResource(Resource resource);
+    void setResource(RamlResource resource);
 
     Map<String, QueryParameter> getQueryParameters();
 
@@ -29,7 +31,7 @@ public interface RamlAction {
 
     void setDescription(String description);
 
-    ActionType getType();
+    RamlActionType getType();
 
     void setType(RamlActionType type);
 

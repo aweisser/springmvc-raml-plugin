@@ -2,7 +2,13 @@ package com.phoenixnap.oss.ramlapisync.raml.jrp08;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
-import org.raml.model.*;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
+import org.raml.model.Action;
+import org.raml.model.MimeType;
+import org.raml.model.Response;
+import org.raml.model.SecurityReference;
 import org.raml.model.parameter.QueryParameter;
 
 import java.util.List;
@@ -15,19 +21,21 @@ public class Jrp08Action implements RamlAction {
 
     private Action action;
 
+    private final RamlModelFactory ramlModelFactory = RamlModelFactoryOfFactories.createRamlModelFactory();
+
     public Jrp08Action(Action action) {
         this.action = action;
     }
 
 
     @Override
-    public Resource getResource() {
-        return action.getResource();
+    public RamlResource getResource() {
+        return ramlModelFactory.createRamlResource(action.getResource());
     }
 
     @Override
-    public void setResource(Resource resource) {
-        action.setResource(resource);
+    public void setResource(RamlResource resource) {
+        action.setResource(ramlModelFactory.createResource(resource));
     }
 
     @Override
@@ -66,8 +74,8 @@ public class Jrp08Action implements RamlAction {
     }
 
     @Override
-    public ActionType getType() {
-        return action.getType();
+    public RamlActionType getType() {
+        return RamlActionType.asRamlActionType(action.getType());
     }
 
     @Override

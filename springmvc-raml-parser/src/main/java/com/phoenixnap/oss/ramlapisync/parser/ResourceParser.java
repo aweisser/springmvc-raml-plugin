@@ -21,9 +21,10 @@ import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.raml.model.MimeType;
 import org.raml.model.ParamType;
-import org.raml.model.Resource;
 import org.raml.model.Response;
 import org.raml.model.parameter.QueryParameter;
 import org.slf4j.Logger;
@@ -66,11 +67,11 @@ public abstract class ResourceParser {
 	protected RamlModelFactory ramlModelFactory;
 	
 
-	public ResourceParser(File javaDocPath, String version, String defaultMediaType, RamlModelFactory ramlModelFactory) {
+	public ResourceParser(File javaDocPath, String version, String defaultMediaType) {
 		this.version = version;
 		this.defaultMediaType = defaultMediaType;
 		this.javaDocs = new JavaDocExtractor(javaDocPath);
-		this.ramlModelFactory = ramlModelFactory;
+		this.ramlModelFactory = RamlModelFactoryOfFactories.createRamlModelFactory();
 	}
 
 	/**
@@ -80,7 +81,7 @@ public abstract class ResourceParser {
 	 * @param clazz
 	 * @return
 	 */
-	private void getMethodsFromService(Class<?> clazz, JavaDocStore javaDoc, Resource parentResource) {
+	private void getMethodsFromService(Class<?> clazz, JavaDocStore javaDoc, RamlResource parentResource) {
 		try {
 			for (Method method : clazz.getMethods()) {
 				if (!IGNORE_METHOD_REGEX.matcher(method.getName()).matches() && shouldAddMethodToApi(method)) {
@@ -284,7 +285,7 @@ public abstract class ResourceParser {
 	 * @param docEntry The associated JavaDoc (may be null)
 	 * @param parentResource The Resource which contains this method
 	 */
-	protected abstract void extractAndAppendResourceInfo(Method method, JavaDocEntry docEntry, Resource parentResource);
+	protected abstract void extractAndAppendResourceInfo(Method method, JavaDocEntry docEntry, RamlResource parentResource);
 
 	/**
 	 * Checks is this api call is made directly on a resource without a trailing command in the URL. eg: POST on
@@ -349,9 +350,9 @@ public abstract class ResourceParser {
 	 * @param clazz The Class to be inspected
 	 * @return The RAML Resource model for this class
 	 */
-	public Resource extractResourceInfo(Class<?> clazz) {
+	public RamlResource extractResourceInfo(Class<?> clazz) {
 		logger.info("Parsing resource: " + clazz.getSimpleName() + " ");
-		Resource resource = new Resource();
+		RamlResource resource = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlResource();
 		resource.setRelativeUri("/" + getResourceName(clazz));
 		resource.setDisplayName(clazz.getSimpleName()); // TODO allow the Api annotation to specify
 														// this stuff :)

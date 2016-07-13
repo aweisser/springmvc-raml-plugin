@@ -14,9 +14,8 @@ package com.phoenixnap.oss.ramlapisync.naming;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.jsonschema2pojo.util.NameHelper;
-import org.raml.model.ActionType;
-import org.raml.model.Resource;
 import org.raml.parser.utils.Inflector;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
@@ -256,7 +255,7 @@ public class NamingHelper {
 	 * @param resource The raml resource being parsed
 	 * @return A name representing this resource or null if one cannot be inferred
 	 */
-	public static String getResourceName(Resource resource) {
+	public static String getResourceName(RamlResource resource) {
 		String url = resource.getRelativeUri();
     	if (StringUtils.hasText(url)) {
 			if (url.contains("/") 
@@ -305,8 +304,8 @@ public class NamingHelper {
 	 * @param actionType The ActionType/HTTP Verb for this Action
 	 * @return The java name of the method that will represent this Action
 	 */
-	public static String getActionName(Resource controllerizedResource, Resource resource, RamlAction action,
-			RamlActionType actionType) {
+	public static String getActionName(RamlResource controllerizedResource, RamlResource resource, RamlAction action,
+									   RamlActionType actionType) {
 		
 		String url = resource.getUri();
 		//Since this will be part of a resource/controller, remove the parent portion of the URL if enough details remain
@@ -375,7 +374,7 @@ public class NamingHelper {
     			collection = true;
     		} 
     		String prefix = convertActionTypeToIntent(actionType, collection);
-    		if (collection && ActionType.POST.equals(actionType)) {
+    		if (collection && RamlActionType.POST.equals(actionType)) {
     			name = Inflector.singularize(name);
     		}
     		

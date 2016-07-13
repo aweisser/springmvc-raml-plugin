@@ -16,8 +16,11 @@ import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
-import com.phoenixnap.oss.ramlapisync.verification.*;
-import org.raml.model.ActionType;
+import com.phoenixnap.oss.ramlapisync.verification.Issue;
+import com.phoenixnap.oss.ramlapisync.verification.IssueLocation;
+import com.phoenixnap.oss.ramlapisync.verification.IssueSeverity;
+import com.phoenixnap.oss.ramlapisync.verification.IssueType;
+import com.phoenixnap.oss.ramlapisync.verification.RamlActionVisitorCheck;
 import org.raml.model.MimeType;
 import org.raml.model.parameter.QueryParameter;
 import org.slf4j.Logger;
@@ -50,7 +53,7 @@ public class ActionQueryParameterChecker implements RamlActionVisitorCheck {
 	protected static final Logger logger = LoggerFactory.getLogger(ActionQueryParameterChecker.class);
 
 	@Override
-	public Pair<Set<Issue>, Set<Issue>> check(ActionType name, RamlAction reference, RamlAction target, IssueLocation location, IssueSeverity maxSeverity) {
+	public Pair<Set<Issue>, Set<Issue>> check(RamlActionType name, RamlAction reference, RamlAction target, IssueLocation location, IssueSeverity maxSeverity) {
 		logger.debug("Checking Action " + name);
 		Set<Issue> errors = new LinkedHashSet<>();
 		Set<Issue> warnings = new LinkedHashSet<>();
@@ -79,7 +82,7 @@ public class ActionQueryParameterChecker implements RamlActionVisitorCheck {
 							&& targetBody.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE) != null
 							&& targetBody.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters() != null
 							&& targetBody.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters().containsKey(cParam.getKey())
-							&& ResourceParser.doesActionTypeSupportRequestBody(RamlActionType.asRamlActionType(reference.getType()))) {
+							&& ResourceParser.doesActionTypeSupportRequestBody(reference.getType())) {
 					   issue = new Issue(IssueSeverity.WARNING, location, IssueType.MISSING, QUERY_PARAMETER_FOUND_IN_FORM , reference.getResource(), reference, cParam.getKey());
 					} else {
 					   issue = new Issue(targetSeverity, location, IssueType.MISSING, QUERY_PARAMETER_MISSING , reference.getResource(), reference, cParam.getKey());

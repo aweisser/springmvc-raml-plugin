@@ -12,13 +12,9 @@
  */
 package com.phoenixnap.oss.ramlapisync.plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Paths;
-
+import com.phoenixnap.oss.ramlapisync.generation.RamlGenerator;
+import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
+import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -29,9 +25,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.phoenixnap.oss.ramlapisync.generation.RamlGenerator;
-import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
-import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 
 /**
  * Maven Plugin MOJO specific to Spring MVC Projects.
