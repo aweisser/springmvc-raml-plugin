@@ -4,9 +4,11 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlDocumentationItem;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
 import org.raml.v2.api.model.v08.api.Api;
+import org.raml.v2.api.model.v08.bodies.MimeType;
 import org.raml.v2.api.model.v08.resources.Resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +26,18 @@ public class Jrp08V2RamlRoot implements RamlRoot {
         this.api = api;
     }
 
+    /**
+     * Expose internal representation only package private
+     * @return the internal model
+     */
+    Api getApi() {
+        return api;
+    }
+
     @Override
     public String getMediaType() {
-        return api.mediaType().value();
+        MimeType mimeType = api.mediaType();
+        return mimeType == null ? null : mimeType.value();
     }
 
     @Override
@@ -70,7 +81,7 @@ public class Jrp08V2RamlRoot implements RamlRoot {
             RamlResource ramlResource = ramlModelFactory.createRamlResource(resource);
             resources.put(relativePath, ramlResource);
         });
-        return resources;
+        return Collections.unmodifiableMap(resources);
     }
 
     @Override

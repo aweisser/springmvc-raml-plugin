@@ -29,17 +29,6 @@ public class Jrp08V1RamlRoot implements RamlRoot {
         this.raml = raml;
     }
 
-    private void syncResources() {
-        if(resources.size() != raml.getResources().size()) {
-            resources.clear();
-            Map<String, Resource> baseResources = raml.getResources();
-            for (String key : baseResources.keySet()) {
-                RamlResource ramlResource = ramlModelFactory.createRamlResource(baseResources.get(key));
-                this.resources.put(key, ramlResource);
-            }
-        }
-    }
-
     /**
      * Expose internal representation only package private
      * @return the internal model
@@ -58,6 +47,17 @@ public class Jrp08V1RamlRoot implements RamlRoot {
     public Map<String, RamlResource> getResources() {
         syncResources();
         return Collections.unmodifiableMap(resources);
+    }
+
+    private void syncResources() {
+        if(resources.size() != raml.getResources().size()) {
+            resources.clear();
+            Map<String, Resource> baseResources = raml.getResources();
+            for (String key : baseResources.keySet()) {
+                RamlResource ramlResource = ramlModelFactory.createRamlResource(baseResources.get(key));
+                this.resources.put(key, ramlResource);
+            }
+        }
     }
 
     @Override

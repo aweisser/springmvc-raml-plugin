@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * java-raml-parser v1 for raml 0.8
+ *
  * @author armin.weisser
  */
 public class Jrp08V1RamlModelFactory implements RamlModelFactory {

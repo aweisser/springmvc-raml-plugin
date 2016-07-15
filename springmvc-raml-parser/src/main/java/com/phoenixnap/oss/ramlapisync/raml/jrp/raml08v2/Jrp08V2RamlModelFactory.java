@@ -11,6 +11,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.v08.api.Api;
+import org.raml.v2.api.model.v08.resources.Resource;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public class Jrp08V2RamlModelFactory implements RamlModelFactory {
     @Override
     public RamlModelEmitter createRamlModelEmitter() {
-        return null;
+        return new Jrp08V2RamlModelEmitter();
     }
 
     @Override
@@ -55,7 +56,7 @@ public class Jrp08V2RamlModelFactory implements RamlModelFactory {
 
     @Override
     public RamlResource createRamlResource(Object resource) {
-        return null;
+        return new Jrp08V2RamlResource((Resource)resource);
     }
 
     @Override
