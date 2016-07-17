@@ -1,13 +1,12 @@
 package com.phoenixnap.oss.ramlapisync.raml.jrp.raml08v2;
 
 import com.google.gson.stream.JsonWriter;
+import com.phoenixnap.oss.ramlapisync.raml.DefaultRamlModelEmitter;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelEmitter;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
-import org.raml.v2.api.model.v08.api.Api;
 import org.raml.yagi.framework.model.ModelUtils;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -22,7 +21,8 @@ import java.util.List;
 public class Jrp08V2RamlModelEmitter implements RamlModelEmitter {
     @Override
     public String dump(RamlRoot ramlRoot) {
-        Api api = ((Jrp08V2RamlRoot) ramlRoot).getApi();
+        return new DefaultRamlModelEmitter().dump(ramlRoot);
+       /* Api api = ((Jrp08V2RamlRoot) ramlRoot).getApi();
         final StringWriter out = new StringWriter();
         final JsonWriter jsonWriter = new JsonWriter(out);
         jsonWriter.setIndent(" ");
@@ -32,6 +32,7 @@ public class Jrp08V2RamlModelEmitter implements RamlModelEmitter {
         } catch (Exception e) {
             return e.getMessage();
         }
+        */
     }
 
     // Taken from org.raml.v2.api.ApiModelParserTestCase

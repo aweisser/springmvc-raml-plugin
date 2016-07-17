@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -17,7 +18,7 @@ import static org.junit.Assert.assertThat;
 public class RamlModelFactoryTest {
 
     @Test
-    public void raml08V1_and_raml08V2_shouldBeEquivalent() throws InvalidRamlResourceException {
+    public void raml08V1_and_raml08V2_shouldHaveEquivalentRamlRoot() throws InvalidRamlResourceException {
 
         Jrp08V1RamlModelFactory ramlModelFactory08V1 = new Jrp08V1RamlModelFactory();
         RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V1);
@@ -38,6 +39,24 @@ public class RamlModelFactoryTest {
 
 
 
+    }
+
+    @Test
+    public void raml08V1_and_raml08V2_shouldHaveEquivalentStringRepresentation() throws InvalidRamlResourceException {
+
+        Jrp08V1RamlModelFactory ramlModelFactory08V1 = new Jrp08V1RamlModelFactory();
+        RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V1);
+        RamlRoot ramlRoot08V1 = ramlModelFactory08V1.buildRamlRoot("test-simple.raml");
+        RamlModelEmitter ramlModelEmitter08V1 = ramlModelFactory08V1.createRamlModelEmitter();
+        String raml08V1 = ramlModelEmitter08V1.dump(ramlRoot08V1);
+
+        Jrp08V2RamlModelFactory ramlModelFactory08V2 = new Jrp08V2RamlModelFactory();
+        RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V2);
+        RamlRoot ramlRoot08V2 = ramlModelFactory08V2.buildRamlRoot("test-simple.raml");
+        RamlModelEmitter ramlModelEmitter08V2 = ramlModelFactory08V2.createRamlModelEmitter();
+        String raml08V2 = ramlModelEmitter08V2.dump(ramlRoot08V2);
+
+        assertEquals(raml08V1, raml08V2);
     }
 
 
