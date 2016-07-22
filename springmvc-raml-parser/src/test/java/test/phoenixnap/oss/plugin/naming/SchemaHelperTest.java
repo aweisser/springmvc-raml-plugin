@@ -13,9 +13,9 @@
 package test.phoenixnap.oss.plugin.naming;
 
 import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
+import com.phoenixnap.oss.ramlapisync.raml.RamlParamType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlQueryParameter;
 import org.junit.Test;
-import org.raml.model.ParamType;
-import org.raml.model.parameter.QueryParameter;
 import test.phoenixnap.oss.plugin.naming.testclasses.ThreeElementClass;
 
 import java.lang.reflect.Method;
@@ -75,11 +75,11 @@ public class SchemaHelperTest {
 	public void test_convertParameterToQueryParameter_boxedPrimitive() {
 		String methodName = "testMethod_with_boxedPrimitive";
 		String comment = "testComment";
-		Map<String, QueryParameter> queryParameters = SchemaHelper.convertParameterToQueryParameter(
+		Map<String, RamlQueryParameter> queryParameters = SchemaHelper.convertParameterToQueryParameter(
 				getParameterFromSampleMethod(methodName, 0), comment);
 		assertEquals("Expect Map with 1 Elements", 1, queryParameters.size());
-		QueryParameter queryParameter = queryParameters.values().iterator().next();
-		validateQueryParameter(queryParameter, "boxedPrimitive", ParamType.INTEGER);
+		RamlQueryParameter queryParameter = queryParameters.values().iterator().next();
+		validateQueryParameter(queryParameter, "boxedPrimitive", RamlParamType.INTEGER);
 		assertEquals("Check javadoc as description", comment, queryParameter.getDescription());
 		assertEquals("Expect Name as map key", queryParameter, queryParameters.get(queryParameter.getDisplayName()));
 	}
@@ -87,11 +87,11 @@ public class SchemaHelperTest {
 	@Test
 	public void test_convertParameterToQueryParameter_primitive() {
 		String methodName = "testMethod_with_primitive";
-		Map<String, QueryParameter> queryParameters = SchemaHelper.convertParameterToQueryParameter(
+		Map<String, RamlQueryParameter> queryParameters = SchemaHelper.convertParameterToQueryParameter(
 				getParameterFromSampleMethod(methodName, 0), null);
 		assertEquals("Expect Map with 1 Elements", 1, queryParameters.size());
-		QueryParameter queryParameter = queryParameters.values().iterator().next();
-		validateQueryParameter(queryParameter, "primitive", ParamType.INTEGER);
+		RamlQueryParameter queryParameter = queryParameters.values().iterator().next();
+		validateQueryParameter(queryParameter, "primitive", RamlParamType.INTEGER);
 		assertEquals("Expect Name as map key", queryParameter, queryParameters.get(queryParameter.getDisplayName()));
 	}
 
@@ -110,21 +110,21 @@ public class SchemaHelperTest {
 	@Test
 	public void test_convertClassToQueryParameters_classWith3Elements() {
 		String methodName = "testMethod_with_classWith3Elements";
-		QueryParameter queryParameter;
-		Map<String, QueryParameter> queryParameters = SchemaHelper.convertClassToQueryParameters(
+		RamlQueryParameter queryParameter;
+		Map<String, RamlQueryParameter> queryParameters = SchemaHelper.convertClassToQueryParameters(
 				getParameterFromSampleMethod(methodName, 0), null);
 		assertEquals("Expect Map with three Elements", 3, queryParameters.size());
-		Iterator<QueryParameter> qpIterator = queryParameters.values().iterator();
+		Iterator<RamlQueryParameter> qpIterator = queryParameters.values().iterator();
 		queryParameter = qpIterator.next();
-		validateQueryParameter(queryParameter, "element1", ParamType.INTEGER);
+		validateQueryParameter(queryParameter, "element1", RamlParamType.INTEGER);
 		assertEquals("Expect Name as map key", queryParameter, queryParameters.get(queryParameter.getDisplayName()));
 
 		queryParameter = qpIterator.next();
-		validateQueryParameter(queryParameter, "element2", ParamType.INTEGER);
+		validateQueryParameter(queryParameter, "element2", RamlParamType.INTEGER);
 		assertEquals("Expect Name as map key", queryParameter, queryParameters.get(queryParameter.getDisplayName()));
 
 		queryParameter = qpIterator.next();
-		validateQueryParameter(queryParameter, "element3", ParamType.STRING);
+		validateQueryParameter(queryParameter, "element3", RamlParamType.STRING);
 		assertEquals("Expect Name as map key", queryParameter, queryParameters.get(queryParameter.getDisplayName()));
 	}
 
@@ -134,7 +134,7 @@ public class SchemaHelperTest {
 	 * @param name
 	 * @param expectedType
      */
-	private void validateQueryParameter(QueryParameter queryParameter, String name, ParamType expectedType) {
+	private void validateQueryParameter(RamlQueryParameter queryParameter, String name, RamlParamType expectedType) {
 		assertEquals("Expect Correct Type for element: " + name, expectedType, queryParameter.getType());
 		assertEquals("Expect Name", name, queryParameter.getDisplayName());
 

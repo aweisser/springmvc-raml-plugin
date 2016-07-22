@@ -14,6 +14,7 @@ package test.phoenixnap.oss.plugin.naming;
 
 import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiResourceMetadata;
+import com.phoenixnap.oss.ramlapisync.data.RamlFormParameter;
 import com.phoenixnap.oss.ramlapisync.generation.RamlParser;
 import com.phoenixnap.oss.ramlapisync.generation.RamlVerifier;
 import com.phoenixnap.oss.ramlapisync.javadoc.JavaDocEntry;
@@ -24,20 +25,19 @@ import com.phoenixnap.oss.ramlapisync.parser.FileSearcher;
 import com.phoenixnap.oss.ramlapisync.parser.SpringMvcResourceParser;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlMimeType;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
+import com.phoenixnap.oss.ramlapisync.raml.RamlParamType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlQueryParameter;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResponse;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
+import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.raml.model.MimeType;
-import org.raml.model.ParamType;
-import org.raml.model.Response;
-import org.raml.model.parameter.FormParameter;
-import org.raml.model.parameter.QueryParameter;
-import org.raml.model.parameter.UriParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -46,6 +46,7 @@ import test.phoenixnap.oss.plugin.naming.testclasses.MultipleContentTypeTestCont
 import test.phoenixnap.oss.plugin.naming.testclasses.NoValueController;
 import test.phoenixnap.oss.plugin.naming.testclasses.TestController;
 import test.phoenixnap.oss.plugin.naming.testclasses.UriPrefixIgnoredController;
+import test.phoenixnap.oss.plugin.naming.testclasses.WrappedResponseBodyTestController;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -58,6 +59,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
 
 /**
  * Unit tests for the Spring MVC Parser
@@ -84,7 +86,7 @@ public class SpringMvcResourceParserTest {
 
 	private void validateSimpleAjaxResponse(RamlAction action) {
 		assertEquals(1, action.getResponses().size());
-		Response response = RamlHelper.getSuccessfulResponse(action);
+		RamlResponse response = RamlHelper.getSuccessfulResponse(action);
 		assertEquals("Checking return javadoc", RETURN_JAVADOC, response.getDescription());
 		assertEquals(1, response.getBody().size());
 		assertNotNull("Check Response is there", response.getBody().get(DEFAULT_MEDIA_TYPE));
@@ -93,7 +95,7 @@ public class SpringMvcResourceParserTest {
 	
 	private void validateMultipleResponse(RamlAction action) {
 		assertEquals(1, action.getResponses().size());
-		Response response = RamlHelper.getSuccessfulResponse(action);
+		RamlResponse response = RamlHelper.getSuccessfulResponse(action);
 		assertEquals("Checking return javadoc", RETURN_JAVADOC, response.getDescription());
 		assertEquals(2, response.getBody().size());
 		assertNotNull("Check Response is there", response.getBody().get(MediaType.APPLICATION_JSON_VALUE));		
@@ -132,10 +134,38 @@ public class SpringMvcResourceParserTest {
 		baseResourceTestController = parser.extractResourceInfo(TestController.class);
 	}
 	
+	@Test
+	public void test_wrappedResponseBody__Success() {
+		RamlResource resourceInfo = parser.extractResourceInfo(WrappedResponseBodyTestController.class);
+
+		RamlResource testResource = resourceInfo.getResource("/base").getResource("/endpointWithResponseType");
+		String testClassId = "urn:jsonschema:test:phoenixnap:oss:plugin:naming:testclasses:ThreeElementClass";
+		checkResourceWrappedResponse(testResource, testClassId);
+
+		testResource = resourceInfo.getResource("/base").getResource("/endpointWithResponseTypeNonGeneric");
+		testClassId = "\"type\" : \"any\"";
+		checkResourceWrappedResponse(testResource, testClassId);
+
+
+	}
+
+	public void checkResourceWrappedResponse(RamlResource testResource, String testClassId) {
+		assertEquals("Assert resources size", 2, testResource.getActions().size());
+		RamlAction getAction = testResource.getActions().get(RamlActionType.GET);
+		RamlAction postAction = testResource.getActions().get(RamlActionType.POST);
+		assertNotNull(getAction);
+		assertNotNull(postAction);
+		assertEquals("Assert Javadoc", COMMENT_JAVADOC, getAction.getDescription());
+		assertEquals("Assert Javadoc", COMMENT_JAVADOC, postAction.getDescription());
+		assertTrue(getAction.getResponses().get("200").getBody().get("application/test+json").getSchema().contains(testClassId));
+		assertTrue(postAction.getResponses().get("200").getBody().get("application/test+json").getSchema().contains(testClassId));
+	}
+
 
 	private static String combineConstantAndName(String constant, String name) {
 		return name + constant;
 	}
+
 
     @Test
     public void test_seperateContentType__Success() throws Exception {
@@ -246,9 +276,9 @@ public class SpringMvcResourceParserTest {
 		assertEquals("Assert Javadoc", COMMENT_JAVADOC, postAction.getDescription());
 
 		// validate Post
-		MimeType getMimeType = getAction.getBody().get(MediaType.TEXT_PLAIN_VALUE);
+		RamlMimeType getMimeType = getAction.getBody().get(MediaType.TEXT_PLAIN_VALUE);
 		assertNull(getMimeType);
-		MimeType postMimeType = postAction.getBody().get(MediaType.TEXT_PLAIN_VALUE);
+		RamlMimeType postMimeType = postAction.getBody().get(MediaType.TEXT_PLAIN_VALUE);
 		assertNotNull(postMimeType);
 
 	}
@@ -270,19 +300,19 @@ public class SpringMvcResourceParserTest {
 		// validate Get
 		String paramName = "param1";
 		assertEquals("Check that parameter was placed in query", 1, getAction.getQueryParameters().size());
-		QueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
-		assertEquals("Check that parameter was placed in query", ParamType.STRING, queryParameter.getType());
+		RamlQueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
+		assertEquals("Check that parameter was placed in query", RamlParamType.STRING, queryParameter.getType());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName),
 				queryParameter.getDescription());
 		assertEquals("Assert Javadoc", COMMENT_JAVADOC, getAction.getDescription());
 
 		// validate Post
-		Map<String, List<FormParameter>> formParameters = postAction.getBody()
+		Map<String, List<RamlFormParameter>> formParameters = postAction.getBody()
 				.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters();
 		assertEquals("Check that parameter was placed in form", 1, formParameters.size());
-		FormParameter formParameter = formParameters.get(paramName).get(0);
+		RamlFormParameter formParameter = formParameters.get(paramName).get(0);
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName), formParameter.getDescription());
-		assertEquals("Check that parameter type is correct", ParamType.STRING, formParameter.getType());
+		assertEquals("Check that parameter type is correct", RamlParamType.STRING, formParameter.getType());
 	}
 
 	@Test
@@ -301,30 +331,30 @@ public class SpringMvcResourceParserTest {
 		// validate Get
 		paramName = "param1";
 		assertEquals("Check that parameters were placed in query", 2, getAction.getQueryParameters().size());
-		QueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
-		assertEquals("Check that parameter was placed in query", ParamType.INTEGER, queryParameter.getType());
+		RamlQueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
+		assertEquals("Check that parameter was placed in query", RamlParamType.INTEGER, queryParameter.getType());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName),
 				queryParameter.getDescription());
 
 		paramName = "nameOverride";
-		QueryParameter queryParameter2 = getAction.getQueryParameters().get(paramName);
-		assertEquals("Check that parameter was placed in query", ParamType.STRING, queryParameter2.getType());
+		RamlQueryParameter queryParameter2 = getAction.getQueryParameters().get(paramName);
+		assertEquals("Check that parameter was placed in query", RamlParamType.STRING, queryParameter2.getType());
 		assertEquals("Check that parameter is required", true, queryParameter2.isRequired());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, "param2"),
 				queryParameter2.getDescription());
 
 		// validate Post
 		paramName = "param1";
-		Map<String, List<FormParameter>> formParameters = postAction.getBody()
+		Map<String, List<RamlFormParameter>> formParameters = postAction.getBody()
 				.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters();
 		assertEquals("Check that parameter was placed in form", 2, formParameters.size());
-		FormParameter formParameter = formParameters.get(paramName).get(0);
-		assertEquals("Check that parameter type is correct", ParamType.INTEGER, formParameter.getType());
+		RamlFormParameter formParameter = formParameters.get(paramName).get(0);
+		assertEquals("Check that parameter type is correct", RamlParamType.INTEGER, formParameter.getType());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName), formParameter.getDescription());
 
 		paramName = "nameOverride";
-		FormParameter formParameter2 = formParameters.get(paramName).get(0);
-		assertEquals("Check that parameter type is correct", ParamType.STRING, formParameter2.getType());
+		RamlFormParameter formParameter2 = formParameters.get(paramName).get(0);
+		assertEquals("Check that parameter type is correct", RamlParamType.STRING, formParameter2.getType());
 		assertEquals("Check that parameter is required", true, formParameter2.isRequired());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, "param2"), formParameter2.getDescription());
 	}
@@ -334,8 +364,8 @@ public class SpringMvcResourceParserTest {
 		RamlResource testResource = baseResourceTestController.getResource("/base").getResource("/oneParameter")
 				.getResource("/{pathVariable}");
 		assertEquals("Assert resources size", 1, testResource.getUriParameters().size());
-		UriParameter uriParameter = testResource.getUriParameters().get("pathVariable");
-		assertEquals("Check that parameter was placed in query", ParamType.STRING, uriParameter.getType());
+		RamlUriParameter uriParameter = testResource.getUriParameters().get("pathVariable");
+		assertEquals("Check that parameter was placed in query", RamlParamType.STRING, uriParameter.getType());
 		assertEquals("Check that uriparametersare required", true, uriParameter.isRequired());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, "pathVariable"),
 				uriParameter.getDescription());
@@ -354,27 +384,27 @@ public class SpringMvcResourceParserTest {
 		// validate Get
 		String paramName = "param1";
 		assertEquals("Check that parameter was placed in query", 1, getAction.getQueryParameters().size());
-		QueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
-		assertEquals("Check that parameter was placed in query", ParamType.STRING, queryParameter.getType());
+		RamlQueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
+		assertEquals("Check that parameter was placed in query", RamlParamType.STRING, queryParameter.getType());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName),
 				queryParameter.getDescription());
 		assertEquals("Assert Javadoc", COMMENT_JAVADOC, getAction.getDescription());
 
 		// validate Post
-		Map<String, List<FormParameter>> formParameters = postAction.getBody()
+		Map<String, List<RamlFormParameter>> formParameters = postAction.getBody()
 				.get(MediaType.APPLICATION_FORM_URLENCODED_VALUE).getFormParameters();
 		assertEquals("Check that parameter was placed in form", 1, formParameters.size());
-		FormParameter formParameter = formParameters.get(paramName).get(0);
+		RamlFormParameter formParameter = formParameters.get(paramName).get(0);
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName), formParameter.getDescription());
-		assertEquals("Check that parameter type is correct", ParamType.STRING, formParameter.getType());
+		assertEquals("Check that parameter type is correct", RamlParamType.STRING, formParameter.getType());
 	}
 
 	@Test
 	public void test_simpleGetWithMiscCasesAndPathVariable() {
 		RamlResource testResource = baseResourceTestController.getResource("/base").getResource("/miscCases")
 				.getResource("/{pathVariable}");
-		UriParameter uriParameter = testResource.getUriParameters().get("pathVariable");
-		assertEquals("Check that parameter was placed in query", ParamType.INTEGER, uriParameter.getType());
+		RamlUriParameter uriParameter = testResource.getUriParameters().get("pathVariable");
+		assertEquals("Check that parameter was placed in query", RamlParamType.INTEGER, uriParameter.getType());
 		assertEquals("Check that uriparametersare required", true, uriParameter.isRequired());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, "pathVariable"),
 				uriParameter.getDescription());
@@ -388,8 +418,8 @@ public class SpringMvcResourceParserTest {
 		// validate Get
 		String paramName = "param1";
 		assertEquals("Check that parameter was placed in query", 1, getAction.getQueryParameters().size());
-		QueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
-		assertEquals("Check that parameter was placed in query", ParamType.STRING, queryParameter.getType());
+		RamlQueryParameter queryParameter = getAction.getQueryParameters().get(paramName);
+		assertEquals("Check that parameter was placed in query", RamlParamType.STRING, queryParameter.getType());
 		assertEquals("Assert Javadoc", combineConstantAndName(PARAM_JAVADOC, paramName),
 				queryParameter.getDescription());
 		assertEquals("Check that param is an array", true, queryParameter.isRepeat());

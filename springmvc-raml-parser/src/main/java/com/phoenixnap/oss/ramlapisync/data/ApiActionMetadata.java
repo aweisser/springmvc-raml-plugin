@@ -18,11 +18,10 @@ import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
 import com.phoenixnap.oss.ramlapisync.parser.ResourceParser;
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlMimeType;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
-import org.raml.model.MimeType;
-import org.raml.model.Response;
-import org.raml.model.parameter.FormParameter;
-import org.raml.model.parameter.UriParameter;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResponse;
+import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
@@ -95,7 +94,7 @@ public class ApiActionMetadata {
 		RamlResource targetResource = action.getResource();
 
 		do {
-			for (Entry<String, UriParameter> param : targetResource.getUriParameters().entrySet()) {
+			for (Entry<String, RamlUriParameter> param : targetResource.getUriParameters().entrySet()) {
 				pathVariables.add(new ApiParameterMetadata(param.getKey(), param.getValue()));
 			}
 			targetResource = targetResource.getParentResource();
@@ -133,7 +132,7 @@ public class ApiActionMetadata {
 		}
 	}
 
-	private void collectBodyParams(Entry<String, MimeType> mime) {
+	private void collectBodyParams(Entry<String, RamlMimeType> mime) {
 		if (mime.getKey().equals(MediaType.MULTIPART_FORM_DATA_VALUE) && ResourceParser.doesActionTypeSupportMultipartMime(actionType)) {
 			collectRequestParamsForMime(action.getBody().get(MediaType.MULTIPART_FORM_DATA_VALUE));
 		} else if (mime.getKey().equals(MediaType.APPLICATION_FORM_URLENCODED_VALUE) && ResourceParser.doesActionTypeSupportMultipartMime(actionType)) {
@@ -153,20 +152,20 @@ public class ApiActionMetadata {
 		}
 	}
 
-	private void collectRequestParamsForMime(MimeType requestBody) {
+	private void collectRequestParamsForMime(RamlMimeType requestBody) {
 		if(requestBody == null) return;
-		for (Entry<String, List<FormParameter>> params : requestBody.getFormParameters().entrySet()) {
-			for (FormParameter param : params.getValue()) {
+		for (Entry<String, List<RamlFormParameter>> params : requestBody.getFormParameters().entrySet()) {
+			for (RamlFormParameter param : params.getValue()) {
 				requestParameters.add(new ApiParameterMetadata(params.getKey(), param));
 			}
 		}
 	}
 
 	private void parseResponse(String responseContentTypeFilter) {
-		Response response = RamlHelper.getSuccessfulResponse(action);
+		RamlResponse response = RamlHelper.getSuccessfulResponse(action);
 
 		if (response != null && response.getBody() != null && !response.getBody().isEmpty()) {
-			for (Entry<String, MimeType> body : response.getBody().entrySet()) {
+			for (Entry<String, RamlMimeType> body : response.getBody().entrySet()) {
 				if (responseContentTypeFilter == null || body.getKey().equals(responseContentTypeFilter)) {
 					if (body.getKey().toLowerCase().contains("json")) { //if we have a json type we need to return an object
 						// Continue here!

@@ -10,11 +10,11 @@
 package com.phoenixnap.oss.ramlapisync.naming;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlMimeType;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResourceRoot;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResponse;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
-import org.raml.model.MimeType;
-import org.raml.model.Response;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -82,12 +82,12 @@ public class RamlHelper {
 	 * @param newAction The action we we want to include in the model
 	 */
 	public static void mergeActions (RamlAction existingAction, RamlAction newAction) {
-		Response existingSuccessfulResponse = getSuccessfulResponse(existingAction);
-		Response successfulResponse = getSuccessfulResponse(newAction);
+		RamlResponse existingSuccessfulResponse = getSuccessfulResponse(existingAction);
+		RamlResponse successfulResponse = getSuccessfulResponse(newAction);
 
 		if (existingSuccessfulResponse != null && existingSuccessfulResponse.hasBody() && successfulResponse != null && successfulResponse.hasBody()) {
-			for (Entry<String, MimeType> body : successfulResponse.getBody().entrySet()) {
-				existingSuccessfulResponse.getBody().putIfAbsent(body.getKey(), body.getValue());
+			for (Entry<String, RamlMimeType> body : successfulResponse.getBody().entrySet()) {
+				existingSuccessfulResponse.addToBody(body.getKey(), body.getValue());
 			}
 		}
 	}
@@ -98,7 +98,7 @@ public class RamlHelper {
 	 * @param action The action to parse
 	 * @return The Successful response or null if not found
 	 */
-	public static Response getSuccessfulResponse(RamlAction action) {
+	public static RamlResponse getSuccessfulResponse(RamlAction action) {
 		String[] successfulResponses = new String[] {"200", "201"};
 		for (String code : successfulResponses) {
 			if (action != null && !CollectionUtils.isEmpty(action.getResponses()) && action.getResponses().containsKey(code)) {

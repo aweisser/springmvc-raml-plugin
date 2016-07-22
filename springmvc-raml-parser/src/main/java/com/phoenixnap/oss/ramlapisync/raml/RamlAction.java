@@ -1,11 +1,5 @@
 package com.phoenixnap.oss.ramlapisync.raml;
 
-import org.raml.model.MimeType;
-import org.raml.model.Response;
-import org.raml.model.SecurityReference;
-import org.raml.model.parameter.Header;
-import org.raml.model.parameter.QueryParameter;
-
 import java.util.List;
 import java.util.Map;
 
@@ -16,15 +10,15 @@ public interface RamlAction {
 
     RamlActionType getType();
 
-    Map<String,QueryParameter> getQueryParameters();
+    Map<String, RamlQueryParameter> getQueryParameters();
 
-    Map<String, Response> getResponses();
+    Map<String, RamlResponse> getResponses();
 
     RamlResource getResource();
 
-    Map<String, Header> getHeaders();
+    Map<String, RamlHeader> getHeaders();
 
-    Map<String, MimeType> getBody();
+    Map<String, RamlMimeType> getBody();
 
     boolean hasBody();
 
@@ -32,11 +26,15 @@ public interface RamlAction {
 
     void setDescription(String description);
 
-    void setBody(Map<String, MimeType> body);
+    void setBody(Map<String, RamlMimeType> body);
 
     void setResource(RamlResource resource);
 
     void setType(RamlActionType actionType);
 
-    List<SecurityReference> getSecuredBy();
+    List<RamlSecurityReference> getSecuredBy();
+
+    void addResponse(String httpStatus, RamlResponse response);
+
+    void addQueryParameters(Map<String, RamlQueryParameter> queryParameters);
 }
