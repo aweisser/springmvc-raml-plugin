@@ -46,17 +46,6 @@ public class RJP08V1RamlRoot implements RamlRoot {
         return ramlModelFactory.transformToUnmodifiableMap(raml.getResources(), resources, ramlModelFactory::createRamlResource);
     }
 
-    private void syncResources() {
-        if(resources.size() != raml.getResources().size()) {
-            resources.clear();
-            Map<String, Resource> baseResources = raml.getResources();
-            for (String key : baseResources.keySet()) {
-                RamlResource ramlResource = ramlModelFactory.createRamlResource(baseResources.get(key));
-                this.resources.put(key, ramlResource);
-            }
-        }
-    }
-
     @Override
     public void removeResource(String firstResourcePart) {
         raml.getResources().remove(firstResourcePart);
