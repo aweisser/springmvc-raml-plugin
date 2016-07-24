@@ -1,12 +1,11 @@
 package com.phoenixnap.oss.ramlapisync.raml;
 
-import com.phoenixnap.oss.ramlapisync.raml.jrp.raml08v1.Jrp08V1RamlModelFactory;
-import com.phoenixnap.oss.ramlapisync.raml.jrp.raml08v2.Jrp08V2RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v1.RJP08V1RamlModelFactory;
+import com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v2.RJP08V2RamlModelFactory;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Map;
-
-import static junit.framework.TestCase.assertEquals;
+import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasEquivalentMetaData;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -17,48 +16,34 @@ import static org.junit.Assert.assertThat;
  */
 public class RamlModelFactoryTest {
 
-    @Test
-    public void raml08V1_and_raml08V2_shouldHaveEquivalentRamlRoot() throws InvalidRamlResourceException {
+    public static final String RAML_FILE = "test-simple.raml";
 
-        Jrp08V1RamlModelFactory ramlModelFactory08V1 = new Jrp08V1RamlModelFactory();
+    private static RamlRoot ramlRoot08V1, ramlRoot08V2;
+
+    @BeforeClass
+    public static void initRamlRoots() throws InvalidRamlResourceException {
+        RJP08V1RamlModelFactory ramlModelFactory08V1 = new RJP08V1RamlModelFactory();
         RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V1);
-        RamlRoot ramlRoot08V1 = ramlModelFactory08V1.buildRamlRoot("test-simple.raml");
+        ramlRoot08V1 = ramlModelFactory08V1.createRamlRoot(RAML_FILE);
 
-        Jrp08V2RamlModelFactory ramlModelFactory08V2 = new Jrp08V2RamlModelFactory();
+        RJP08V2RamlModelFactory ramlModelFactory08V2 = new RJP08V2RamlModelFactory();
         RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V2);
-        RamlRoot ramlRoot08V2 = ramlModelFactory08V2.buildRamlRoot("test-simple.raml");
+        ramlRoot08V2 = ramlModelFactory08V2.createRamlRoot(RAML_FILE);
+    }
 
-        assertThat(ramlRoot08V1.getBaseUri(), is(equalTo(ramlRoot08V2.getBaseUri())));
-        assertThat(ramlRoot08V1.getMediaType(), is(equalTo(ramlRoot08V2.getMediaType())));
+    @Test
+    public void modelsShouldHaveEquivalentMetaData() throws InvalidRamlResourceException {
+        assertThat(ramlRoot08V1, hasEquivalentMetaData(ramlRoot08V2));
+    }
+
+    @Test
+    public void modelsShouldHaveEquivalentSchemas() throws InvalidRamlResourceException {
         assertThat(ramlRoot08V1.getSchemas(), is(equalTo(ramlRoot08V2.getSchemas())));
-
-        Map<String, RamlResource> ramlRoot08V1Resources = ramlRoot08V1.getResources();
-        Map<String, RamlResource> ramlRoot08V2Resources = ramlRoot08V2.getResources();
-
-        assertThat(ramlRoot08V1Resources.size(), is(equalTo(ramlRoot08V2Resources.size())));
-
-
-
     }
+
 
     @Test
-    public void raml08V1_and_raml08V2_shouldHaveEquivalentStringRepresentation() throws InvalidRamlResourceException {
-
-        Jrp08V1RamlModelFactory ramlModelFactory08V1 = new Jrp08V1RamlModelFactory();
-        RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V1);
-        RamlRoot ramlRoot08V1 = ramlModelFactory08V1.buildRamlRoot("test-simple.raml");
-        RamlModelEmitter ramlModelEmitter08V1 = ramlModelFactory08V1.createRamlModelEmitter();
-        String raml08V1 = ramlModelEmitter08V1.dump(ramlRoot08V1);
-
-        Jrp08V2RamlModelFactory ramlModelFactory08V2 = new Jrp08V2RamlModelFactory();
-        RamlModelFactoryOfFactories.setRamlModelFactory(ramlModelFactory08V2);
-        RamlRoot ramlRoot08V2 = ramlModelFactory08V2.buildRamlRoot("test-simple.raml");
-        RamlModelEmitter ramlModelEmitter08V2 = ramlModelFactory08V2.createRamlModelEmitter();
-        String raml08V2 = ramlModelEmitter08V2.dump(ramlRoot08V2);
-
-        assertEquals(raml08V1, raml08V2);
+    public void modelsShouldHaveEquivalentResources() throws InvalidRamlResourceException {
+        assertThat(ramlRoot08V1.getResources(), hasEquivalentMetaData(ramlRoot08V2.getResources()));
     }
-
-
-
 }

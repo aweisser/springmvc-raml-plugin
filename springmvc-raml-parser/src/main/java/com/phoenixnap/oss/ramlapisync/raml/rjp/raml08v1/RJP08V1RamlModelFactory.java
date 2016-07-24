@@ -46,19 +46,13 @@ public class RJP08V1RamlModelFactory implements RamlModelFactory {
     }
 
     @Override
-    public RamlRoot buildRamlRoot(String ramlFileUrl) {
-        return createRamlRoot(new RamlDocumentBuilder().build(ramlFileUrl));
-    }
-
-    @Override
     public RamlRoot createRamlRoot() {
         return createRamlRoot(new Raml());
     }
 
     @Override
     public RamlRoot createRamlRoot(String ramlFileUrl) {
-        Raml raml = new RamlDocumentBuilder().build(ramlFileUrl);
-        return createRamlRoot(raml);
+        return createRamlRoot(new RamlDocumentBuilder().build(ramlFileUrl));
     }
 
     RamlRoot createRamlRoot(Raml raml) {

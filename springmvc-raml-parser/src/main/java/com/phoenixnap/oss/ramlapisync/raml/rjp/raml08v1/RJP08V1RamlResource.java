@@ -126,13 +126,13 @@ public class RJP08V1RamlResource implements RamlResource {
     }
 
     @Override
-    public String getParentUri() {
-        return resource.getParentUri();
+    public void setParentUri(String parentUri) {
+        resource.setParentUri(parentUri);
     }
 
     @Override
-    public void setParentUri(String parentUri) {
-        resource.setParentUri(parentUri);
+    public String getParentUri() {
+        return resource.getParentUri();
     }
 
     @Override

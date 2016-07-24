@@ -1,28 +1,29 @@
-package com.phoenixnap.oss.ramlapisync.raml.jrp.raml08v2;
+package com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v2;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlDocumentationItem;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
 import org.raml.v2.api.model.v08.api.Api;
+import org.raml.v2.api.model.v08.api.GlobalSchema;
 import org.raml.v2.api.model.v08.bodies.MimeType;
 import org.raml.v2.api.model.v08.resources.Resource;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author armin.weisser
  */
-public class Jrp08V2RamlRoot implements RamlRoot {
+public class RJP08V2RamlRoot implements RamlRoot {
 
-    private static Jrp08V2RamlModelFactory ramlModelFactory = new Jrp08V2RamlModelFactory();
+    private static RJP08V2RamlModelFactory ramlModelFactory = new RJP08V2RamlModelFactory();
 
     private final Api api;
 
-    public Jrp08V2RamlRoot(Api api) {
+    public RJP08V2RamlRoot(Api api) {
         this.api = api;
     }
 
@@ -42,13 +43,16 @@ public class Jrp08V2RamlRoot implements RamlRoot {
 
     @Override
     public List<Map<String, String>> getSchemas() {
-        List<Map<String, String>> schemas = new ArrayList<>();
-        api.schemas().forEach(globalSchema -> {
-            Map<String, String> schemaProperties = new LinkedHashMap<>();
-            schemaProperties.put(globalSchema.key(), globalSchema.value().value());
-            schemas.add(schemaProperties);
-        });
-        return schemas;
+        return api.schemas()
+                .stream()
+                .map(this::globalSchemaToMap)
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, String> globalSchemaToMap(GlobalSchema globalSchema) {
+        Map<String, String> schemaProperties = new LinkedHashMap<>();
+        schemaProperties.put(globalSchema.key(), globalSchema.value().value());
+        return schemaProperties;
     }
 
     @Override

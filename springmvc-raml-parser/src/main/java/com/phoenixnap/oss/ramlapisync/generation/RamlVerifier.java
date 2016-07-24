@@ -14,6 +14,7 @@ package com.phoenixnap.oss.ramlapisync.generation;
 
 import com.phoenixnap.oss.ramlapisync.naming.Pair;
 import com.phoenixnap.oss.ramlapisync.naming.RamlHelper;
+import com.phoenixnap.oss.ramlapisync.raml.InvalidRamlResourceException;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
 import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
@@ -173,6 +174,9 @@ public class RamlVerifier {
 			return ramlModelFactory.createRamlRoot(ramlFileUrl);
 		} catch (NullPointerException npe) {
 			logger.error("File not found at " + ramlFileUrl);
+			return null;
+		} catch (InvalidRamlResourceException e) {
+			logger.error(e.getMessage());
 			return null;
 		}
 	}

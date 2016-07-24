@@ -1,27 +1,31 @@
-package com.phoenixnap.oss.ramlapisync.raml.jrp.raml08v2;
+package com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v2;
 
 import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactory;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
-import org.raml.model.parameter.UriParameter;
+import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.raml.v2.api.model.v08.resources.Resource;
+import org.raml.v2.api.model.v08.system.types.MarkdownString;
 
 import java.util.Map;
 
 /**
  * @author armin.weisser
  */
-public class Jrp08V2RamlResource implements RamlResource {
+public class RJP08V2RamlResource implements RamlResource {
+
+    private static RamlModelFactory ramlModelFactory = new RJP08V2RamlModelFactory();
 
     private final Resource resource;
 
-    public Jrp08V2RamlResource(Resource resource) {
+    public RJP08V2RamlResource(Resource resource) {
         this.resource = resource;
     }
 
     @Override
     public String getRelativeUri() {
-        return null;
+        return resource.relativeUri().value();
     }
 
     @Override
@@ -30,28 +34,34 @@ public class Jrp08V2RamlResource implements RamlResource {
     }
 
     @Override
-    public Map<String, UriParameter> getUriParameters() {
+    public Map<String, RamlUriParameter> getUriParameters() {
         return null;
     }
 
     @Override
-    public Map<String, UriParameter> getResolvedUriParameters() {
+    public void addUriParameter(String name, RamlUriParameter uriParameter) {
+
+    }
+
+    @Override
+    public Map<String, RamlUriParameter> getResolvedUriParameters() {
         return null;
     }
 
     @Override
     public String getUri() {
-        return null;
+        return getRelativeUri();
     }
 
     @Override
     public String getDescription() {
-        return null;
+        MarkdownString description = resource.description();
+        return description == null ? null: description.value();
     }
 
     @Override
     public RamlResource getParentResource() {
-        return null;
+        return ramlModelFactory.createRamlResource(resource.parentResource());
     }
 
     @Override
@@ -61,7 +71,8 @@ public class Jrp08V2RamlResource implements RamlResource {
 
     @Override
     public String getParentUri() {
-        return null;
+        if(getParentResource() == null) return "";
+        return getParentResource().getUri();
     }
 
     @Override
