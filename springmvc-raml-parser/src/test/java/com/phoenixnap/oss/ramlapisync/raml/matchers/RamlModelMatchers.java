@@ -1,5 +1,6 @@
 package com.phoenixnap.oss.ramlapisync.raml.matchers;
 
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualActionMetaData;
@@ -25,12 +26,20 @@ public interface RamlModelMatchers {
         return new HasEqualSchemas(root);
     }
 
-    static Matcher<Map<String, RamlResource>> hasSameMetaDataAs(Map<String, RamlResource> resources) {
-        return new RecursiveMultiResourcesMatcher(resources, actual -> new HasEqualResourceMetaData(actual));
+    static Matcher<RamlResource> hasSameMetaDataAs(RamlResource actuelResource) {
+        return new HasEqualResourceMetaData(actuelResource);
     }
 
-    static Matcher<Map<String, RamlResource>> hasSameActionsMetaDataAs(Map<String, RamlResource> resources) {
-        return new RecursiveMultiResourcesMatcher(resources, actualResource -> new MultiActionsMatcher(actualResource, actualAction -> new HasEqualActionMetaData(actualAction)));
+    static Matcher<RamlAction> hasSameMetaDataAs(RamlAction actualAction) {
+        return new HasEqualActionMetaData(actualAction);
+    }
+
+    static Matcher<Map<String, RamlResource>> hasSameMetaDataAs(Map<String, RamlResource> actualResources) {
+        return new RecursiveMultiResourcesMatcher(actualResources, actual -> new HasEqualResourceMetaData(actual));
+    }
+
+    static Matcher<Map<String, RamlResource>> hasSameActionsMetaDataAs(Map<String, RamlResource> actualResources) {
+        return new RecursiveMultiResourcesMatcher(actualResources, actualResource -> new MultiActionsMatcher(actualResource, actualAction -> new HasEqualActionMetaData(actualAction)));
     }
 
 }

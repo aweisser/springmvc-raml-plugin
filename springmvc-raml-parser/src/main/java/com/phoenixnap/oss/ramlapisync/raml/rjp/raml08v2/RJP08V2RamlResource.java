@@ -20,6 +20,7 @@ public class RJP08V2RamlResource implements RamlResource {
 
     private final Resource resource;
     private Map<String, RamlResource> resources = new LinkedHashMap<>();
+    private Map<RamlActionType, RamlAction> actions = new LinkedHashMap<>();
 
     public RJP08V2RamlResource(Resource resource) {
         this.resource = resource;
@@ -32,13 +33,7 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<RamlActionType, RamlAction> getActions() {
-        Map<RamlActionType, RamlAction> ramlActions = new LinkedHashMap<>();
-        resource.methods().forEach(method -> {
-            RamlActionType ramlActionType = ramlModelFactory.createRamlActionType(method);
-            RamlAction ramlAction = ramlModelFactory.createRamlAction(method);
-            ramlActions.put(ramlActionType, ramlAction);
-        });
-        return ramlActions;
+        return ramlModelFactory.transformToUnmodifiableMap(resource.methods(), actions, ramlModelFactory::createRamlAction, ramlModelFactory::createRamlActionType);
     }
 
     @Override
@@ -105,7 +100,7 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public RamlAction getAction(RamlActionType actionType) {
-        return null;
+        return getActions().get(actionType);
     }
 
     @Override
@@ -120,19 +115,16 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<String, RamlResource> getResources() {
-        Map<String, Resource> sourceResources = new LinkedHashMap<>();
-        resource.resources().forEach(r -> sourceResources.put(r.relativeUri().value(), r));
-        return ramlModelFactory.transformToUnmodifiableMap(sourceResources, resources, ramlModelFactory::createRamlResource);
+        return ramlModelFactory.transformToUnmodifiableMap(
+                resource.resources(),
+                resources,
+                ramlModelFactory::createRamlResource,
+                r -> r.relativeUri().value());
     }
 
     @Override
     public void addResource(String path, RamlResource childResource) {
 
-    }
-
-    @Override
-    public RamlResource getResource(String path) {
-        return null;
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import com.phoenixnap.oss.ramlapisync.raml.RamlResponse;
 import com.phoenixnap.oss.ramlapisync.raml.RamlSecurityReference;
 import org.raml.v2.api.model.v08.methods.Method;
+import org.raml.v2.api.model.v08.system.types.MarkdownString;
 
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,8 @@ public class RJPV2RamlAction implements RamlAction {
 
     @Override
     public String getDescription() {
-        return null;
+        MarkdownString description = method.description();
+        return description == null ? null : description.value();
     }
 
     @Override

@@ -61,22 +61,6 @@ public class RJP08V2RamlRoot implements RamlRoot {
     }
 
     @Override
-    public RamlResource getResource(String path) {
-        for (Resource resource : api.resources()) {
-            String relativeUriOfResource = resource.relativeUri().value();
-            if (path.startsWith(relativeUriOfResource)) {
-                if (path.length() == relativeUriOfResource.length()) {
-                    return ramlModelFactory.createRamlResource(resource);
-                }
-                if (path.charAt(relativeUriOfResource.length()) == '/') {
-                    return getResource(path.substring(relativeUriOfResource.length()));
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
     public Map<String, RamlResource> getResources() {
         List<Resource> originalResources = api.resources();
         Map<String, RamlResource> resources = new LinkedHashMap<>(originalResources.size());
