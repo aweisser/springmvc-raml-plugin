@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author armin.weisser
  */
-public class RamlModelFactoryTest {
+public class RamlModelEquivalenceTest {
 
     public static final String RAML_FILE = "test-simple.raml";
 
