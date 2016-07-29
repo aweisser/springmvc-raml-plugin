@@ -7,6 +7,7 @@ import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualActionMetaD
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualRamlRootMetaData;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualResourceMetaData;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualSchemas;
+import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasSameUriParameters;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.MultiActionsMatcher;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.RecursiveMultiResourcesMatcher;
 import org.hamcrest.Matcher;
@@ -40,6 +41,11 @@ public interface RamlModelMatchers {
 
     static Matcher<Map<String, RamlResource>> hasSameActionsMetaDataAs(Map<String, RamlResource> actualResources) {
         return new RecursiveMultiResourcesMatcher(actualResources, actualResource -> new MultiActionsMatcher(actualResource, actualAction -> new HasEqualActionMetaData(actualAction)));
+    }
+
+
+    static Matcher<? super RamlResource> hasSameUriParametersAs(RamlResource actual) {
+        return new HasSameUriParameters(actual);
     }
 
 }

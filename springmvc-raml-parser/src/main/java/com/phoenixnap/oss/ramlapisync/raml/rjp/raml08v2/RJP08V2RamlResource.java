@@ -8,6 +8,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.raml.v2.api.model.v08.resources.Resource;
 import org.raml.v2.api.model.v08.system.types.MarkdownString;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ public class RJP08V2RamlResource implements RamlResource {
     private final Resource resource;
     private Map<String, RamlResource> resources = new LinkedHashMap<>();
     private Map<RamlActionType, RamlAction> actions = new LinkedHashMap<>();
+    private Map<String, RamlUriParameter> uriParameters = new LinkedHashMap<>();
 
     public RJP08V2RamlResource(Resource resource) {
         this.resource = resource;
@@ -42,7 +44,11 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<String, RamlUriParameter> getUriParameters() {
-        return null;
+        return ramlModelFactory.transformToUnmodifiableMap(
+                resource.baseUriParameters(),
+                uriParameters,
+                ramlModelFactory::createRamlUriParameter,
+                p -> p.name());
     }
 
     @Override
@@ -52,7 +58,12 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<String, RamlUriParameter> getResolvedUriParameters() {
-        return null;
+        RamlResource parentResource = getParentResource();
+        Map<String, RamlUriParameter> resolvedUriParameters = new LinkedHashMap<>(getUriParameters());
+        if(parentResource != null) {
+            resolvedUriParameters.putAll(parentResource.getUriParameters());
+        }
+        return Collections.unmodifiableMap(resolvedUriParameters);
     }
 
     @Override

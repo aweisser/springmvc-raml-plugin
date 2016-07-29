@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This is the root element of a .raml spec.
+ * It holds the top-level meta information like version, mediaType or baseUri
+ * as well as a reference to all top-level resources.
+ *
  * @author armin.weisser
  */
 public interface RamlRoot extends RamlResourceRoot {

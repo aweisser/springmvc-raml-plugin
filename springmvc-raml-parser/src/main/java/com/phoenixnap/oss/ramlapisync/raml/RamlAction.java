@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A RamlAction represents an executable method on a resource.
+ * Every RamlAction is identified by its type (GET, PUT, POST, DELETE ...).
+ * Every RamlResource can only have one RamlAction for each type.
+ *
  * @author armin.weisser
  */
 public interface RamlAction {

@@ -2,13 +2,19 @@ package com.phoenixnap.oss.ramlapisync.raml;
 
 import com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v1.RJP08V1RamlModelFactory;
 import com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v2.RJP08V2RamlModelFactory;
+import org.hamcrest.Matchers;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.raml.v2.api.RamlModelBuilder;
+import org.raml.v2.api.RamlModelResult;
+import org.raml.v2.api.model.v08.api.Api;
+import org.raml.v2.api.model.v08.resources.Resource;
 
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameActionsMetaDataAs;
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameMetaDataAs;
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameSchemasAs;
-import static org.junit.Assert.assertThat;
+import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameUriParametersAs;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 /**
@@ -78,5 +84,46 @@ public class RamlModelEquivalenceTest {
         RamlResource actual = ramlRoot08V2.getResource("/base/endpointWithGet");
         assertThat(expected, hasSameMetaDataAs(actual));
     }
+
+    @Test
+    public void resourcesShouldHandleEndpointWithAUriParam() {
+        RamlResource expected = ramlRoot08V1.getResource("/secondBase/endpointWithURIParam/{uriParam}");
+        RamlResource actual = ramlRoot08V2.getResource("/secondBase/endpointWithURIParam/{uriParam}");
+        assertThat(expected, hasSameUriParametersAs(actual));
+    }
+
+    @Test
+    public void resourcesShouldHandleEndpointWithMultipleUriParams() {
+        RamlResource expected = ramlRoot08V1.getResource("/secondBase/endpointWithURIParam/{uriParam}/list/{anotherUriParam}");
+        RamlResource actual = ramlRoot08V2.getResource("/secondBase/endpointWithURIParam/{uriParam}/list/{anotherUriParam}");
+        assertThat(expected, hasSameUriParametersAs(actual));
+    }
+
+    @Test
+    // https://github.com/raml-org/raml-java-parser/issues/201
+    public void uriParamsShouldNotBeNull() {
+        String raml =
+                "#%RAML 0.8\n" +
+                "title: myapi\n" +
+                "baseUri: /\n" +
+                "version: 1\n" +
+                "\n" +
+                "/endpointWithURIParam:\n" +
+                "   /{uriParam}:\n" +
+                "       get:";
+
+        RamlModelResult ramlModelResult = new RamlModelBuilder().buildApi(raml, ".");
+        Api api = ramlModelResult.getApiV08();
+
+        Resource endpointWithURIParam = api.resources().get(0);
+        assertThat(endpointWithURIParam.displayName(), Matchers.equalTo("/endpointWithURIParam"));
+
+        Resource uriParam = endpointWithURIParam.resources().get(0);
+        assertThat(uriParam.displayName(), Matchers.equalTo("/{uriParam}"));
+
+        assertThat(uriParam.uriParameters(), Matchers.hasSize(1)); // ??? There should be a uriParameter in this resource...
+
+    }
+
 
 }

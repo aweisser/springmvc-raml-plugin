@@ -20,6 +20,7 @@ import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.v08.api.Api;
 import org.raml.v2.api.model.v08.methods.Method;
+import org.raml.v2.api.model.v08.parameters.Parameter;
 import org.raml.v2.api.model.v08.resources.Resource;
 
 import java.util.List;
@@ -129,7 +130,7 @@ public class RJP08V2RamlModelFactory implements RamlModelFactory {
 
     @Override
     public RamlUriParameter createRamlUriParameter(Object o) {
-        return null;
+        return new RJP08V2RamlUriParameter((Parameter)o);
     }
 
     @Override
