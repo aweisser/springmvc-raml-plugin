@@ -6,9 +6,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
 import org.raml.v2.api.model.v08.api.Api;
 import org.raml.v2.api.model.v08.api.GlobalSchema;
 import org.raml.v2.api.model.v08.bodies.MimeType;
-import org.raml.v2.api.model.v08.resources.Resource;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,7 @@ public class RJP08V2RamlRoot implements RamlRoot {
     private static RJP08V2RamlModelFactory ramlModelFactory = new RJP08V2RamlModelFactory();
 
     private final Api api;
+    private Map<String, RamlResource> resources = new LinkedHashMap<>();
 
     public RJP08V2RamlRoot(Api api) {
         this.api = api;
@@ -62,14 +61,11 @@ public class RJP08V2RamlRoot implements RamlRoot {
 
     @Override
     public Map<String, RamlResource> getResources() {
-        List<Resource> originalResources = api.resources();
-        Map<String, RamlResource> resources = new LinkedHashMap<>(originalResources.size());
-        originalResources.forEach(resource -> {
-            String relativePath = resource.relativeUri().value();
-            RamlResource ramlResource = ramlModelFactory.createRamlResource(resource);
-            resources.put(relativePath, ramlResource);
-        });
-        return Collections.unmodifiableMap(resources);
+        return ramlModelFactory.transformToUnmodifiableMap(
+                api.resources(),
+                resources,
+                ramlModelFactory::createRamlResource,
+                r -> r.relativeUri().value());
     }
 
     @Override

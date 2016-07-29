@@ -33,7 +33,11 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<RamlActionType, RamlAction> getActions() {
-        return ramlModelFactory.transformToUnmodifiableMap(resource.methods(), actions, ramlModelFactory::createRamlAction, ramlModelFactory::createRamlActionType);
+        return ramlModelFactory.transformToUnmodifiableMap(
+                resource.methods(),
+                actions,
+                ramlModelFactory::createRamlAction,
+                ramlModelFactory::createRamlActionType);
     }
 
     @Override
