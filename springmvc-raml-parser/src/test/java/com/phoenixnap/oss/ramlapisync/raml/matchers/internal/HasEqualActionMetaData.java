@@ -1,6 +1,6 @@
 package com.phoenixnap.oss.ramlapisync.raml.matchers.internal;
 
-import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
@@ -11,20 +11,20 @@ import static org.junit.Assert.assertThat;
 /**
  * @author armin.weisser
  */
-public class HasEquivalentRamlRootMetaData extends BaseMatcher<RamlRoot> {
+public class HasEqualActionMetaData extends BaseMatcher<RamlAction> {
 
-    private final RamlRoot actual;
+    private final RamlAction actual;
 
-    public HasEquivalentRamlRootMetaData(RamlRoot actual) {
+    public HasEqualActionMetaData(RamlAction actual) {
         this.actual = actual;
     }
 
     @Override
     public boolean matches(Object item) {
-        RamlRoot expected = (RamlRoot) item;
+        RamlAction expected = (RamlAction) item;
 
-        assertThat(actual.getBaseUri(), is(equalTo(expected.getBaseUri())));
-        assertThat(actual.getMediaType(), is(equalTo(expected.getMediaType())));
+        assertThat(actual.getDescription(), is(equalTo(expected.getDescription())));
+        assertThat(actual.getType(), is(equalTo(expected.getType())));
 
         return true;
     }

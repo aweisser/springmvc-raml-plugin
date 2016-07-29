@@ -19,6 +19,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.v08.api.Api;
+import org.raml.v2.api.model.v08.methods.Method;
 import org.raml.v2.api.model.v08.resources.Resource;
 
 import java.util.List;
@@ -71,7 +72,8 @@ public class RJP08V2RamlModelFactory implements RamlModelFactory {
 
     @Override
     public RamlAction createRamlAction(Object action) {
-        return null;
+        Method method = (Method) action;
+        return new RJPV2RamlAction(method);
     }
 
     @Override
@@ -91,7 +93,8 @@ public class RJP08V2RamlModelFactory implements RamlModelFactory {
 
     @Override
     public RamlActionType createRamlActionType(Object type) {
-        return null;
+        Method method = (Method)type;
+        return RamlActionType.valueOf(method.method().toUpperCase());
     }
 
     @Override

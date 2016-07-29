@@ -8,6 +8,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.raml.v2.api.model.v08.resources.Resource;
 import org.raml.v2.api.model.v08.system.types.MarkdownString;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -18,6 +19,7 @@ public class RJP08V2RamlResource implements RamlResource {
     private static RamlModelFactory ramlModelFactory = new RJP08V2RamlModelFactory();
 
     private final Resource resource;
+    private Map<String, RamlResource> resources = new LinkedHashMap<>();
 
     public RJP08V2RamlResource(Resource resource) {
         this.resource = resource;
@@ -30,7 +32,13 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<RamlActionType, RamlAction> getActions() {
-        return null;
+        Map<RamlActionType, RamlAction> ramlActions = new LinkedHashMap<>();
+        resource.methods().forEach(method -> {
+            RamlActionType ramlActionType = ramlModelFactory.createRamlActionType(method);
+            RamlAction ramlAction = ramlModelFactory.createRamlAction(method);
+            ramlActions.put(ramlActionType, ramlAction);
+        });
+        return ramlActions;
     }
 
     @Override
@@ -50,7 +58,7 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public String getUri() {
-        return getRelativeUri();
+        return resource.resourcePath();
     }
 
     @Override
@@ -112,7 +120,9 @@ public class RJP08V2RamlResource implements RamlResource {
 
     @Override
     public Map<String, RamlResource> getResources() {
-        return null;
+        Map<String, Resource> sourceResources = new LinkedHashMap<>();
+        resource.resources().forEach(r -> sourceResources.put(r.relativeUri().value(), r));
+        return ramlModelFactory.transformToUnmodifiableMap(sourceResources, resources, ramlModelFactory::createRamlResource);
     }
 
     @Override

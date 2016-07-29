@@ -11,17 +11,21 @@ import static org.junit.Assert.assertThat;
 /**
  * @author armin.weisser
  */
-public class HasEquivalentResourceMetaData extends BaseMatcher<RamlResource> {
+public class HasEqualResourceMetaData extends BaseMatcher<RamlResource> {
 
     private final RamlResource actualResource;
 
-    public HasEquivalentResourceMetaData(RamlResource actualResource) {
+    public HasEqualResourceMetaData(RamlResource actualResource) {
         this.actualResource = actualResource;
     }
 
     @Override
     public boolean matches(Object item) {
         RamlResource expectedResource = (RamlResource) item;
+
+        if(actualResource == expectedResource) {
+            return true;
+        }
 
         assertThat(actualResource.getUri(), is(equalTo(expectedResource.getUri())));
         assertThat(actualResource.getRelativeUri(), is(equalTo(expectedResource.getRelativeUri())));

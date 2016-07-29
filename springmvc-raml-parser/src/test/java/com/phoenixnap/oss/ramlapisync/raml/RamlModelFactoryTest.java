@@ -5,9 +5,9 @@ import com.phoenixnap.oss.ramlapisync.raml.rjp.raml08v2.RJP08V2RamlModelFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasEquivalentMetaData;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameActionsMetaDataAs;
+import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameMetaDataAs;
+import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameSchemasAs;
 import static org.junit.Assert.assertThat;
 
 
@@ -32,18 +32,23 @@ public class RamlModelFactoryTest {
     }
 
     @Test
-    public void modelsShouldHaveEquivalentMetaData() throws InvalidRamlResourceException {
-        assertThat(ramlRoot08V1, hasEquivalentMetaData(ramlRoot08V2));
+    public void modelsShouldHaveSameMetaData() {
+        assertThat(ramlRoot08V1, hasSameMetaDataAs(ramlRoot08V2));
     }
 
     @Test
-    public void modelsShouldHaveEquivalentSchemas() throws InvalidRamlResourceException {
-        assertThat(ramlRoot08V1.getSchemas(), is(equalTo(ramlRoot08V2.getSchemas())));
+    public void modelsShouldHaveSameSchemas()  {
+        assertThat(ramlRoot08V1, hasSameSchemasAs(ramlRoot08V2));
     }
-
 
     @Test
-    public void modelsShouldHaveEquivalentResources() throws InvalidRamlResourceException {
-        assertThat(ramlRoot08V1.getResources(), hasEquivalentMetaData(ramlRoot08V2.getResources()));
+    public void modelsShouldHaveSameResourcesMetaData()  {
+        assertThat(ramlRoot08V1.getResources(), hasSameMetaDataAs(ramlRoot08V2.getResources()));
     }
+
+    @Test
+    public void modelsShouldHaveSameActionsMetaData() {
+        assertThat(ramlRoot08V1.getResources(), hasSameActionsMetaDataAs(ramlRoot08V2.getResources()));
+    }
+
 }
