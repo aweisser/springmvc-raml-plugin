@@ -11,6 +11,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlSecurityReference;
 import org.raml.v2.api.model.v08.methods.Method;
 import org.raml.v2.api.model.v08.system.types.MarkdownString;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ public class RJPV2RamlAction implements RamlAction {
     private static RJP08V2RamlModelFactory ramlModelFactory = new RJP08V2RamlModelFactory();
 
     private final Method method;
+    private Map<String, RamlQueryParameter> queryParameters = new LinkedHashMap<>();
 
     public RJPV2RamlAction(Method method) {
         this.method = method;
@@ -34,7 +36,11 @@ public class RJPV2RamlAction implements RamlAction {
 
     @Override
     public Map<String, RamlQueryParameter> getQueryParameters() {
-        return null;
+        return ramlModelFactory.transformToUnmodifiableMap(
+                method.queryParameters(),
+                queryParameters,
+                ramlModelFactory::createRamlQueryParameter,
+                p ->  p.name());
     }
 
     @Override

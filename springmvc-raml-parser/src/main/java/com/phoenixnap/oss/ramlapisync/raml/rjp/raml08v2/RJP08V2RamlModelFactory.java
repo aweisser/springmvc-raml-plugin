@@ -16,6 +16,7 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlResponse;
 import com.phoenixnap.oss.ramlapisync.raml.RamlRoot;
 import com.phoenixnap.oss.ramlapisync.raml.RamlSecurityReference;
 import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
+import com.phoenixnap.oss.ramlapisync.raml.UnknownParamTypeException;
 import org.raml.v2.api.RamlModelBuilder;
 import org.raml.v2.api.RamlModelResult;
 import org.raml.v2.api.model.v08.api.Api;
@@ -129,8 +130,8 @@ public class RJP08V2RamlModelFactory implements RamlModelFactory {
     }
 
     @Override
-    public RamlUriParameter createRamlUriParameter(Object o) {
-        return new RJP08V2RamlUriParameter((Parameter)o);
+    public RamlUriParameter createRamlUriParameter(Object uriParameter) {
+        return new RJP08V2RamlUriParameter((Parameter)uriParameter);
     }
 
     @Override
@@ -145,7 +146,7 @@ public class RJP08V2RamlModelFactory implements RamlModelFactory {
 
     @Override
     public RamlQueryParameter createRamlQueryParameter(Object queryParameter) {
-        return null;
+        return new RJP08V2RamlQueryParameter((Parameter)queryParameter);
     }
 
     @Override
@@ -175,6 +176,14 @@ public class RJP08V2RamlModelFactory implements RamlModelFactory {
 
     @Override
     public RamlParamType createRamlParamType(Object paramType) {
-        return null;
+        if(paramType == null) {
+            // TODO This is a hack: https://github.com/raml-org/raml-java-parser/issues/204
+            return RamlParamType.STRING;
+        }
+        RamlParamType ramlParamType = RamlParamType.valueOf(paramType.toString().toUpperCase());
+        if(ramlParamType == null) {
+            throw new UnknownParamTypeException(paramType.toString());
+        }
+        return ramlParamType;
     }
 }

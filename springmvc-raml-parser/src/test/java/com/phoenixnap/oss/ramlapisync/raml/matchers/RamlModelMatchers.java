@@ -7,6 +7,7 @@ import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualActionMetaD
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualRamlRootMetaData;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualResourceMetaData;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasEqualSchemas;
+import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasSameQueryParameters;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.HasSameUriParameters;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.MultiActionsMatcher;
 import com.phoenixnap.oss.ramlapisync.raml.matchers.internal.RecursiveMultiResourcesMatcher;
@@ -43,9 +44,12 @@ public interface RamlModelMatchers {
         return new RecursiveMultiResourcesMatcher(actualResources, actualResource -> new MultiActionsMatcher(actualResource, actualAction -> new HasEqualActionMetaData(actualAction)));
     }
 
-
-    static Matcher<? super RamlResource> hasSameUriParametersAs(RamlResource actual) {
+    static Matcher<RamlResource> hasSameUriParametersAs(RamlResource actual) {
         return new HasSameUriParameters(actual);
+    }
+
+    static Matcher<RamlAction> hasSameQueryParametersAs(RamlAction actual) {
+        return new HasSameQueryParameters(actual);
     }
 
 }

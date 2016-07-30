@@ -22,7 +22,6 @@ public class HasEqualRamlParameterMetaData extends BaseMatcher<RamlAbstractParam
     public boolean matches(Object item) {
         RamlAbstractParam expected = (RamlAbstractParam) item;
 
-        assertThat(actual.getClass(), equalTo(expected.getClass()));
         assertThat(actual.getDescription(), equalTo(expected.getDescription()));
         assertThat(actual.getType(), equalTo(expected.getType()));
         assertThat(actual.getDisplayName(), equalTo(expected.getDisplayName()));

@@ -6,7 +6,22 @@ version: 1
 /base:
   /endpointWithGet:
     get:
-      description: "A description"
+      description: "A description of endpointWithGet"
+      queryParameters:
+        param1:
+          displayName: Param 1
+          type: integer
+          description: |
+            A brief description of param 1
+          example: 1234
+          required: true
+        param2:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: |
+            [1-9]*
+        param3: ## default type should be string. DisplayName is empty.
   /endpointWithGetAndPost:
     get:
       responses:

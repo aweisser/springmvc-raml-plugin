@@ -20,38 +20,38 @@ public class HasSameUriParameters extends BaseMatcher<RamlResource> {
     @Override
     public boolean matches(Object item) {
         RamlResource expected = (RamlResource) item;
-        Map<String, RamlUriParameter> expectedUriParameters = expected.getUriParameters();
-        Map<String, RamlUriParameter> actualUriParameters = actual.getUriParameters();
-        boolean uriParametersOk = checkUriParameters(expectedUriParameters, actualUriParameters);
+        Map<String, RamlUriParameter> expectedParameters = expected.getUriParameters();
+        Map<String, RamlUriParameter> actualParameters = actual.getUriParameters();
+        boolean uriParametersOk = checkUriParameters(expectedParameters, actualParameters);
 
         if(!uriParametersOk) {
             return false;
         }
 
-        expectedUriParameters = expected.getResolvedUriParameters();
-        actualUriParameters = actual.getResolvedUriParameters();
-        boolean resolvedUriParametersOk = checkUriParameters(expectedUriParameters, actualUriParameters);
+        expectedParameters = expected.getResolvedUriParameters();
+        actualParameters = actual.getResolvedUriParameters();
+        boolean resolvedUriParametersOk = checkUriParameters(expectedParameters, actualParameters);
 
         return uriParametersOk && resolvedUriParametersOk;
     }
 
-    private boolean checkUriParameters(Map<String, RamlUriParameter> expectedUriParameters, Map<String, RamlUriParameter> actualUriParameters) {
-        if(expectedUriParameters == actualUriParameters) {
+    private boolean checkUriParameters(Map<String, RamlUriParameter> expectedParameters, Map<String, RamlUriParameter> actualParameters) {
+        if(expectedParameters == actualParameters) {
             return true;
         }
 
-        if(expectedUriParameters == null && actualUriParameters != null || expectedUriParameters != null && actualUriParameters == null) {
+        if(expectedParameters == null && actualParameters != null || expectedParameters != null && actualParameters == null) {
             return false;
         }
 
-        if(expectedUriParameters.size() != actualUriParameters.size()) {
+        if(expectedParameters.size() != actualParameters.size()) {
             return false;
         }
 
         // check all RamlUriParameters and apply the HasEqualRamlParameterMetaData matcher
-        return actualUriParameters.keySet().stream().allMatch(key -> {
-            RamlUriParameter actualItem = actualUriParameters.get(key);
-            RamlUriParameter expectedItem = expectedUriParameters.get(key);
+        return actualParameters.keySet().stream().allMatch(key -> {
+            RamlUriParameter actualItem = actualParameters.get(key);
+            RamlUriParameter expectedItem = expectedParameters.get(key);
             return new HasEqualRamlParameterMetaData(actualItem).matches(expectedItem);
         });
     }

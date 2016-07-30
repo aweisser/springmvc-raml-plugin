@@ -12,6 +12,7 @@ import org.raml.v2.api.model.v08.resources.Resource;
 
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameActionsMetaDataAs;
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameMetaDataAs;
+import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameQueryParametersAs;
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameSchemasAs;
 import static com.phoenixnap.oss.ramlapisync.raml.matchers.RamlModelMatchers.hasSameUriParametersAs;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -123,6 +124,13 @@ public class RamlModelEquivalenceTest {
 
         assertThat(uriParam.uriParameters(), Matchers.hasSize(1)); // ??? There should be a uriParameter in this resource...
 
+    }
+
+    @Test
+    public void resourcesShouldHandleEndpointWithQueryParams() {
+        RamlAction expected = ramlRoot08V1.getResource("/base/endpointWithGet").getAction(RamlActionType.GET);
+        RamlAction actual = ramlRoot08V2.getResource("/base/endpointWithGet").getAction(RamlActionType.GET);;
+        assertThat(expected, hasSameQueryParametersAs(actual));
     }
 
 
