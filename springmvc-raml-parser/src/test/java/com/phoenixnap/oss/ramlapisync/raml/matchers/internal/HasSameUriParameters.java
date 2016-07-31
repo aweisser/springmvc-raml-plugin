@@ -5,6 +5,8 @@ import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,6 +14,8 @@ import java.util.Map;
  */
 public class HasSameUriParameters extends BaseMatcher<RamlResource> {
     private final RamlResource actual;
+    private List<String> expectedMessages = new ArrayList<>();
+    private String but = "";
 
     public HasSameUriParameters(RamlResource actual) {
         this.actual = actual;
@@ -25,6 +29,7 @@ public class HasSameUriParameters extends BaseMatcher<RamlResource> {
         boolean uriParametersOk = checkUriParameters(expectedParameters, actualParameters);
 
         if(!uriParametersOk) {
+            expectedMessages.add("UriParameters check failed.");
             return false;
         }
 
@@ -32,7 +37,12 @@ public class HasSameUriParameters extends BaseMatcher<RamlResource> {
         actualParameters = actual.getResolvedUriParameters();
         boolean resolvedUriParametersOk = checkUriParameters(expectedParameters, actualParameters);
 
-        return uriParametersOk && resolvedUriParametersOk;
+        if(!resolvedUriParametersOk) {
+            expectedMessages.add("Resolved UriParameters check failed. ");
+            return false;
+        }
+
+        return true;
     }
 
     private boolean checkUriParameters(Map<String, RamlUriParameter> expectedParameters, Map<String, RamlUriParameter> actualParameters) {
@@ -40,11 +50,21 @@ public class HasSameUriParameters extends BaseMatcher<RamlResource> {
             return true;
         }
 
-        if(expectedParameters == null && actualParameters != null || expectedParameters != null && actualParameters == null) {
+        if(expectedParameters == null && actualParameters != null) {
+            expectedMessages.add("No UriParameters. ");
+            but = "found " + actualParameters.size();
+            return false;
+        }
+
+        if(expectedParameters != null && actualParameters == null) {
+            expectedMessages.add(+expectedParameters.size() +" UriParameters. ");
+            but = "found none.";
             return false;
         }
 
         if(expectedParameters.size() != actualParameters.size()) {
+            expectedMessages.add(expectedParameters.size() + " UriParameters. ");
+            but = "found " + actualParameters.size();
             return false;
         }
 
@@ -58,6 +78,11 @@ public class HasSameUriParameters extends BaseMatcher<RamlResource> {
 
     @Override
     public void describeTo(Description description) {
+        expectedMessages.forEach(m -> description.appendText(m));
+    }
 
+    @Override
+    public void describeMismatch(Object item, Description description) {
+        description.appendText(but);
     }
 }

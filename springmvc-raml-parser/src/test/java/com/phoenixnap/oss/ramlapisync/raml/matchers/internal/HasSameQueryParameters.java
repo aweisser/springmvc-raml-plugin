@@ -11,7 +11,10 @@ import java.util.Map;
  * @author armin.weisser
  */
 public class HasSameQueryParameters extends BaseMatcher<RamlAction> {
+
     private final RamlAction actual;
+    private String expectedMessage = "";
+    private String but = "";
 
     public HasSameQueryParameters(RamlAction actual) {
         this.actual = actual;
@@ -26,11 +29,21 @@ public class HasSameQueryParameters extends BaseMatcher<RamlAction> {
             return true;
         }
 
-        if(expectedParameters == null && actualParameters != null || expectedParameters != null && actualParameters == null) {
+        if(expectedParameters == null && actualParameters != null) {
+            expectedMessage = "No QueryParameters.";
+            but =  "found " + actualParameters.size();
+            return false;
+        }
+
+        if(expectedParameters != null && actualParameters == null) {
+            expectedMessage = expectedParameters.size() +" QueryParameters.";
+            but = "Found none.";
             return false;
         }
 
         if(expectedParameters.size() != actualParameters.size()) {
+            expectedMessage = expectedParameters.size() + " QueryParameters";
+            but = "found " + actualParameters.size();
             return false;
         }
 
@@ -44,6 +57,11 @@ public class HasSameQueryParameters extends BaseMatcher<RamlAction> {
 
     @Override
     public void describeTo(Description description) {
+        description.appendText(expectedMessage);
+    }
 
+    @Override
+    public void describeMismatch(Object item, Description description) {
+        description.appendText(but);
     }
 }
