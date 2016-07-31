@@ -90,6 +90,7 @@ public class RamlModelEquivalenceTest {
     public void resourcesShouldHandleEndpointWithAUriParam() {
         RamlResource expected = ramlRoot08V1.getResource("/secondBase/endpointWithURIParam/{uriParam}");
         RamlResource actual = ramlRoot08V2.getResource("/secondBase/endpointWithURIParam/{uriParam}");
+        // TODO Fails due to https://github.com/raml-org/raml-java-parser/issues/201
         assertThat(expected, hasSameUriParametersAs(actual));
     }
 
@@ -97,11 +98,12 @@ public class RamlModelEquivalenceTest {
     public void resourcesShouldHandleEndpointWithMultipleUriParams() {
         RamlResource expected = ramlRoot08V1.getResource("/secondBase/endpointWithURIParam/{uriParam}/list/{anotherUriParam}");
         RamlResource actual = ramlRoot08V2.getResource("/secondBase/endpointWithURIParam/{uriParam}/list/{anotherUriParam}");
+        // TODO Fails due to https://github.com/raml-org/raml-java-parser/issues/201
         assertThat(expected, hasSameUriParametersAs(actual));
     }
 
     @Test
-    // https://github.com/raml-org/raml-java-parser/issues/201
+    // TODO Fails due to https://github.com/raml-org/raml-java-parser/issues/201
     public void uriParamsShouldNotBeNull() {
         String raml =
                 "#%RAML 0.8\n" +
