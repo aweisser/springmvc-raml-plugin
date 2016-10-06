@@ -12,15 +12,14 @@
  */
 package test.phoenixnap.oss.plugin.naming;
 
-import static org.junit.Assert.assertEquals;
-
+import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
+import com.phoenixnap.oss.ramlapisync.raml.RamlModelFactoryOfFactories;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.junit.Test;
-import org.raml.model.Resource;
-
 import test.phoenixnap.oss.plugin.naming.testclasses.CamelCaseTest;
 import test.phoenixnap.oss.plugin.naming.testclasses.ServicesControllerImpl;
 
-import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit tests for the NamingHelper class
@@ -40,19 +39,19 @@ public class NamingHelperTest {
 	
 	@Test
 	public void test_getResourceName_Success() {
-		Resource testResource = new Resource();
+		RamlResource testResource = RamlModelFactoryOfFactories.createRamlModelFactory().createRamlResource();
 		
 		testResource.setRelativeUri("/service_thingy");
-		assertEquals("Should deal with underscores", "ServiceThingy", NamingHelper.getResourceName(testResource));
+		assertEquals("Should deal with underscores", "ServiceThingy", NamingHelper.getResourceName(testResource, true));
 		
 		testResource.setRelativeUri("/quotes");
-		assertEquals("Should deal with plural", "Quote", NamingHelper.getResourceName(testResource));
+		assertEquals("Should deal with plural", "Quote", NamingHelper.getResourceName(testResource, true));
 		
 		testResource.setRelativeUri("/2342quotes");
-		assertEquals("Should deal with invalid java identifiers", "_2342quote", NamingHelper.getResourceName(testResource));
+		assertEquals("Should deal with invalid java identifiers", "_2342quote", NamingHelper.getResourceName(testResource, true));
 		
 		testResource.setRelativeUri("/;qu%ot'es");
-		assertEquals("Should deal with invalid java characters", "quote", NamingHelper.getResourceName(testResource));
+		assertEquals("Should deal with invalid java characters", "quote", NamingHelper.getResourceName(testResource, true));
 	}
 
 	@Test

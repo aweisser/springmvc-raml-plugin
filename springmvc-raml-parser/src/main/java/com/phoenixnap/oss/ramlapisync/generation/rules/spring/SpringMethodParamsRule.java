@@ -12,8 +12,8 @@
  */
 package com.phoenixnap.oss.ramlapisync.generation.rules.spring;
 
-import org.raml.model.parameter.Header;
-import org.raml.model.parameter.UriParameter;
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,6 +23,8 @@ import com.phoenixnap.oss.ramlapisync.data.ApiActionMetadata;
 import com.phoenixnap.oss.ramlapisync.data.ApiParameterMetadata;
 import com.phoenixnap.oss.ramlapisync.generation.CodeModelHelper;
 import com.phoenixnap.oss.ramlapisync.generation.rules.basic.MethodParamsRule;
+import com.phoenixnap.oss.ramlapisync.raml.RamlHeader;
+import com.phoenixnap.oss.ramlapisync.raml.RamlUriParameter;
 import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JVar;
 
@@ -63,10 +65,10 @@ public class SpringMethodParamsRule extends MethodParamsRule {
     protected JVar param(ApiParameterMetadata paramMetaData, CodeModelHelper.JExtMethod generatableType) {
         JVar jVar = super.param(paramMetaData, generatableType);
         JAnnotationUse jAnnotationUse;
-        if (paramMetaData.getRamlParam() != null && paramMetaData.getRamlParam() instanceof UriParameter) {
+        if (paramMetaData.getRamlParam() != null && paramMetaData.getRamlParam() instanceof RamlUriParameter) {
             jVar.annotate(PathVariable.class);
             return jVar;
-        } else if (paramMetaData.getRamlParam() != null && paramMetaData.getRamlParam() instanceof Header) {
+        } else if (paramMetaData.getRamlParam() != null && paramMetaData.getRamlParam() instanceof RamlHeader) {
             jAnnotationUse = jVar.annotate(RequestHeader.class);
             jAnnotationUse.param("name", paramMetaData.getName());
             if (!paramMetaData.getRamlParam().isRequired()) {
@@ -89,6 +91,7 @@ public class SpringMethodParamsRule extends MethodParamsRule {
     @Override
     protected JVar param(ApiActionMetadata endpointMetadata, CodeModelHelper.JExtMethod generatableType) {
         JVar param = super.param(endpointMetadata, generatableType);
+        param.annotate(Valid.class);
         param.annotate(RequestBody.class);
         return param;
     }

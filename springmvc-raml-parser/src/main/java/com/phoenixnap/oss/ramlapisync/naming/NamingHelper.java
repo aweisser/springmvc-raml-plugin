@@ -12,16 +12,16 @@
  */
 package com.phoenixnap.oss.ramlapisync.naming;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.phoenixnap.oss.ramlapisync.raml.RamlAction;
+import com.phoenixnap.oss.ramlapisync.raml.RamlActionType;
+import com.phoenixnap.oss.ramlapisync.raml.RamlResource;
 import org.jsonschema2pojo.util.NameHelper;
-import org.raml.model.Action;
-import org.raml.model.ActionType;
-import org.raml.model.Resource;
 import org.raml.parser.utils.Inflector;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class containing methods relating to naming converntions and string cleanup for naming
@@ -253,14 +253,15 @@ public class NamingHelper {
 	 * Attempts to infer the name of a resource from a resources's relative URL
 	 * 
 	 * @param resource The raml resource being parsed
+	 * @param singularize indicates if the resource name should be singularized or not
 	 * @return A name representing this resource or null if one cannot be inferred
 	 */
-	public static String getResourceName(Resource resource) {
+	public static String getResourceName(RamlResource resource, boolean singularize) {
 		String url = resource.getRelativeUri();
     	if (StringUtils.hasText(url)) {
 			if (url.contains("/") 
 					&& (url.lastIndexOf("/") < url.length())) {
-				return getResourceName(url.substring(url.lastIndexOf("/")+1));
+				return getResourceName(url.substring(url.lastIndexOf("/")+1), singularize);
 			}
 		}
     	return null;
@@ -270,11 +271,15 @@ public class NamingHelper {
 	 * Attempts to infer the name of a resource from a resources's relative URL
 	 * 
 	 * @param resource The Url representation of this object
+	 * @param singularize indicates if the resource name should be singularized or not
 	 * @return A name representing this resource or null if one cannot be inferred
 	 */
-	public static String getResourceName(String resource) {
+	public static String getResourceName(String resource, boolean singularize) {
 		if (StringUtils.hasText(resource)) {
-				String resourceName = Inflector.singularize(StringUtils.capitalize(resource));
+				String resourceName = StringUtils.capitalize(resource);
+				if (singularize) {
+					resourceName = Inflector.singularize(resourceName);
+				} 
 				resourceName = cleanNameForJava(resourceName);
 				return resourceName;
 		}
@@ -313,8 +318,8 @@ public class NamingHelper {
 	 * @param actionType The ActionType/HTTP Verb for this Action
 	 * @return The java name of the method that will represent this Action
 	 */
-	public static String getActionName(Resource controllerizedResource, Resource resource, Action action,
-			ActionType actionType) {
+	public static String getActionName(RamlResource controllerizedResource, RamlResource resource, RamlAction action,
+			RamlActionType actionType) {
 		
 		String url = resource.getUri();
 		//Since this will be part of a resource/controller, remove the parent portion of the URL if enough details remain
@@ -383,7 +388,7 @@ public class NamingHelper {
     			collection = true;
     		} 
     		String prefix = convertActionTypeToIntent(actionType, collection);
-    		if (collection && ActionType.POST.equals(actionType)) {
+    		if (collection && RamlActionType.POST.equals(actionType)) {
     			name = Inflector.singularize(name);
     		}
     		
@@ -400,7 +405,7 @@ public class NamingHelper {
 	 * @param isTargetCollection True if this action is being done on a collection or plural resource (eg: books)
 	 * @return
 	 */
-	private static String convertActionTypeToIntent(ActionType actionType, boolean isTargetCollection) {
+	private static String convertActionTypeToIntent(RamlActionType actionType, boolean isTargetCollection) {
 		switch (actionType) {
 			case DELETE : return "delete";
 			case GET : return "get";

@@ -12,14 +12,12 @@
  */
 package com.phoenixnap.oss.ramlapisync.data;
 
-import org.jsonschema2pojo.Annotator;
-import org.jsonschema2pojo.GenerationConfig;
-import org.raml.model.ParamType;
-
 import com.phoenixnap.oss.ramlapisync.naming.NamingHelper;
 import com.phoenixnap.oss.ramlapisync.naming.SchemaHelper;
+import com.phoenixnap.oss.ramlapisync.raml.RamlParamType;
 import com.sun.codemodel.JCodeModel;
-
+import org.jsonschema2pojo.Annotator;
+import org.jsonschema2pojo.GenerationConfig;
 
 /**
  * 
@@ -36,6 +34,33 @@ public class ApiBodyMetadata {
 	private JCodeModel codeModel;
 	private boolean array = false;
 	
+	public static void main (String[] args) {
+		String schema = "{"
+				+ "\"$schema\": \"http://json-schema.org/draft-04/schema\","
+				+ "\"type\" : \"object\","
+				+ "\"javaType\": \"com.pnap.pncp.rbac.rest.model.Role\","
+				+ "\"id\" : \"role\","
+				+ "\"properties\" : {"
+				+ "\"id\" : {"
+				+ "  \"type\" : \"integer\""
+				+ "},"
+				+ " \"name\" : {"
+				+ "  \"type\" : \"string\""
+				+ "},"
+				+ "\"description\" : {"
+				+ "  \"type\" : \"string\""
+				+ "},"
+				+ "\"addedOn\" : {"
+				+ "  \"type\" : \"integer\","
+				+ "  \"format\" : \"UTC_MILLISEC\""
+				+ "}"
+				+ "},"
+				+ "\"additionalProperties\" : false"
+				+ "}";
+		ApiBodyMetadata abm = new ApiBodyMetadata("blargh", schema, new JCodeModel());
+		System.out.println(abm.getName());
+	}
+	
 	public ApiBodyMetadata (String name, String schema, JCodeModel codeModel) {
 		super();
 		this.schema = schema;
@@ -50,14 +75,14 @@ public class ApiBodyMetadata {
 				int nextQuoteIdxIdx = schema.indexOf("\"", quoteIdx+1);
 				if (nextQuoteIdxIdx != -1) {
 					String possibleType = schema.substring(quoteIdx+1, nextQuoteIdxIdx);
-					this.name = NamingHelper.getResourceName(this.name);
+					this.name = NamingHelper.getResourceName(this.name, true);
 					if ("array".equals(possibleType.toLowerCase())) {
 						array = true;
 					}
 					if (codeModel.countArtifacts() == 0) {
 						if (!"object".equals(possibleType.toLowerCase())) {
 							try {
-								this.name = SchemaHelper.mapSimpleType(ParamType.valueOf(possibleType.toUpperCase())).getSimpleName();
+								this.name = SchemaHelper.mapSimpleType(RamlParamType.valueOf(possibleType.toUpperCase())).getSimpleName();
 							} catch (Exception ex) {
 								this.name = String.class.getSimpleName(); //default to string
 							}
